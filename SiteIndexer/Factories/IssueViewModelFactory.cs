@@ -4,7 +4,6 @@ using System.Linq;
 using System.Web;
 using SiteIndexer.Models.ViewModels;
 using SiteIndexer.Services.Solr.Models;
-using SiteIndexer.Services.Models;
 
 namespace SiteIndexer.Factories
 {

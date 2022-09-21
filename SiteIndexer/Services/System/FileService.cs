@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Web;
 
-namespace SiteIndexer.Services
+namespace SiteIndexer.Services.System
 {
     public interface IFileService
     {
@@ -71,7 +71,7 @@ namespace SiteIndexer.Services
                 {
                     DirectoryInfo fd = new DirectoryInfo(dirPath.ToString());
                     if (!fd.Exists)
-                        System.IO.Directory.CreateDirectory(dirPath.ToString());
+                        Directory.CreateDirectory(dirPath.ToString());
                 }
                 catch (Exception ex) { }
             }

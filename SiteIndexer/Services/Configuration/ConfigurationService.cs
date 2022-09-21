@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
-using SiteIndexer.Services.Models;
+using SiteIndexer.Services.Configuration.Models;
+using SiteIndexer.Services.System;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Web;
 
-namespace SiteIndexer.Services
+namespace SiteIndexer.Services.Configuration
 {
     public interface IConfigurationService
     {
@@ -28,7 +29,7 @@ namespace SiteIndexer.Services
             FileService = fileservice;
             Configurations = new Dictionary<string, ConfigurationModel>();
 
-            var files = FileService.GetFiles("configurations");
+            var files = FileService.GetFiles("App_Data/configurations");
             foreach(var f in files)
             {
                 var model = JsonConvert.DeserializeObject<ConfigurationModel>(f);
@@ -54,7 +55,7 @@ namespace SiteIndexer.Services
             };
 
             var content = JsonConvert.SerializeObject(config);
-            FileService.WriteFile($"configurations/{projectName}.json", content);
+            FileService.WriteFile($"App_Data/configurations/{projectName}.json", content);
         }
     }
 }

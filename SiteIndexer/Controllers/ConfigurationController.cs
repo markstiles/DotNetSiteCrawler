@@ -10,7 +10,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using SiteIndexer.Services.Solr;
-using SiteIndexer.Services.Models;
+using SiteIndexer.Services.Configuration;
 
 namespace SiteIndexer.Controllers
 {

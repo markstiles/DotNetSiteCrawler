@@ -9,7 +9,9 @@ namespace SiteIndexer.Services.Solr
 {
     public interface ISolrApiService
     {
-        //IssueResponseApiModel GetIssues(string jiraUrl, string projectCode, int resultCount, int startAt, List<string> issueTypes);
+        SolrUpdateResponseApiModel AddDocuments(List<SolrDocumentApiModel> models);
+        SolrUpdateResponseApiModel DeleteDocuments(List<SolrDocumentApiModel> models);
+        SolrUpdateResponseApiModel DeleteDocumentsByQuery(string solrQuery);
     }
 
     public class SolrApiService : ISolrApiService
@@ -17,48 +19,44 @@ namespace SiteIndexer.Services.Solr
         #region Constructor
 
         protected readonly ISolrClient Client;
+        protected readonly string SolrCore;
 
         public SolrApiService(ISolrClient client)
         {
             Client = client;
+            //TODO move this to config
+            SolrCore = "webcrawl";
         }
 
         #endregion
 
         #region Context
 
-        //public object AddToIndex()
-        //{
-        //    var client = new RestClient("http://localhost:900/solr/webcrawl/update?commitWithin=1000");
-        //    client.Timeout = -1;
-        //    var request = new RestRequest(Method.POST);
-        //    request.AddHeader("Content-Type", "application/json");
-        //    request.AddParameter("application/json", "[{\r\n    \"id\":\"12345678\",\r\n    \"name\":[\"mark mark mark\"],\r\n    \"features\":[\"No accents here\", \"This document is very shiny (translated)\"],\r\n}]", ParameterType.RequestBody);
-        //    IRestResponse response = client.Execute(request);
-        //    Console.WriteLine(response.Content);
-        //}
+        public SolrUpdateResponseApiModel AddDocuments(List<SolrDocumentApiModel> models)
+        {
+            var apiUrl = $"/solr/{SolrCore}/update?commitWithin=1000";
+            var response = Client.SendPost<SolrUpdateResponseApiModel>(apiUrl, models);
 
-        //public IssueResponseApiModel GetIssues(string jiraUrl, string projectCode, int resultCount, int startAt, List<string> issueTypes)
-        //{
-        //    var jqlPath = $"project='{projectCode}'";
-            
-        //    //this fails if you query for issue types that aren't in the specific endpoint so the issue types must match the endpoint
-        //    //if(issueTypes.Count > 0)
-        //    //{
-        //    //    var issueConditionList = new List<string>();
-        //    //    foreach (var issueType in issueTypes)
-        //    //    {
-        //    //        issueConditionList.Add($"issuetype='{issueType}'");
-        //    //    }
+            return response;
+        }
 
-        //    //    jqlPath = $"{jqlPath} AND ({string.Join(" OR ", issueConditionList)})";
-        //    //}
+        public SolrUpdateResponseApiModel DeleteDocuments(List<SolrDocumentApiModel> models) 
+        {
+            var apiUrl = $"/solr/{SolrCore}/update?commit=true";
+            var deleteModel = new DeleteDocumentsApiModel(models);
+            var response = Client.SendPost<SolrUpdateResponseApiModel>(apiUrl, deleteModel);
 
-        //    var apiUrl = $"{jiraUrl}/rest/api/3/search?jql={HttpUtility.UrlEncode(jqlPath)}&maxResults={resultCount}&startAt={startAt}";
-        //    var response = Client.SendGet<IssueResponseApiModel>(apiUrl);
-            
-        //    return response;
-        //}
+            return response;
+        }
+
+        public SolrUpdateResponseApiModel DeleteDocumentsByQuery(string solrQuery)
+        {
+            var apiUrl = $"/solr/{SolrCore}/update?commit=true";
+            var deleteModel = new DeleteQueryApiModel(solrQuery);
+            var response = Client.SendPost<SolrUpdateResponseApiModel>(apiUrl, deleteModel);
+
+            return response;
+        }
 
         #endregion
     }

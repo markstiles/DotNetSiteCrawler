@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using SiteIndexer.Services.System;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,8 +15,6 @@ namespace SiteIndexer.Services.Solr
     {
         T SendGet<T>(string apiUrl);
         T SendPost<T>(string apiUrl, object parameter);
-        HttpStatusCode SendStatusPost(string apiUrl, object parameter);
-        HttpStatusCode SendDelete(string apiUrl);
     }
 
     public class SolrClient : ISolrClient
@@ -24,15 +23,17 @@ namespace SiteIndexer.Services.Solr
 
         protected readonly ISettings Settings;
         protected readonly ILogService LogService;
-        protected readonly IApiClient ApiClient;
+        protected readonly HttpClient Client;
 
         protected readonly JsonSerializerSettings SerialSettings;
 
-        public SolrClient(ISettings settings, ILogService logService, IApiClient apiClient)
+        public SolrClient(ISettings settings, ILogService logService, IHttpClientFactory clientFactory)
         {
             Settings = settings;
             LogService = logService;
-            ApiClient = apiClient;
+            Client = clientFactory.CreateClient();
+            //TODO move this to the config
+            Client.BaseAddress = new Uri("http://localhost:900");
             SerialSettings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore,
@@ -48,8 +49,8 @@ namespace SiteIndexer.Services.Solr
         {
             LogService.Info($"SolrClient.SendGet - ApiUrl: {apiUrl}");
 
-            ApiClient.InnerClient.DefaultRequestHeaders.Clear();
-            using (var res = Task.Run(() => ApiClient.InnerClient.GetAsync(apiUrl)))
+            Client.DefaultRequestHeaders.Clear();
+            using (var res = Task.Run(() => Client.GetAsync(apiUrl)))
             {
                 res.Wait();
                 var content = res.Result.Content.ReadAsStringAsync().Result;
@@ -71,9 +72,9 @@ namespace SiteIndexer.Services.Solr
             LogService.Info($"SolrClient.SendPost - ApiPath: {apiUrl} - Parameter: {serialContent}");
 
             var paramContent = new StringContent(serialContent, Encoding.UTF8, JsonContentType);
-            ApiClient.InnerClient.DefaultRequestHeaders.Clear();
-            ApiClient.InnerClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(JsonContentType));
-            using (var res = Task.Run(() => ApiClient.InnerClient.PostAsync(apiUrl, paramContent)))
+            Client.DefaultRequestHeaders.Clear();
+            Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(JsonContentType));
+            using (var res = Task.Run(() => Client.PostAsync(apiUrl, paramContent)))
             {
                 res.Wait();
                 var content = res.Result.Content.ReadAsStringAsync().Result;
@@ -81,39 +82,6 @@ namespace SiteIndexer.Services.Solr
                 var response = JsonConvert.DeserializeObject<T>(content);
 
                 return response;
-            }
-        }
-
-        public HttpStatusCode SendStatusPost(string apiUrl, object parameter)
-        {
-            var serialContent = JsonConvert.SerializeObject(parameter, SerialSettings);
-            LogService.Info($"SolrClient.SendStatusPost - ApiPath: {apiUrl} - Parameter: {serialContent}");
-
-            var paramContent = new StringContent(serialContent, Encoding.UTF8, JsonContentType);
-            ApiClient.InnerClient.DefaultRequestHeaders.Clear();
-            ApiClient.InnerClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(JsonContentType));
-            using (var res = Task.Run(() => ApiClient.InnerClient.PostAsync(apiUrl, paramContent)))
-            {
-                res.Wait();
-                var status = res.Result.StatusCode;
-                LogService.Debug($"SolrClient.SendStatusPost - Response: {status}");
-
-                return status;
-            }
-        }
-
-        public HttpStatusCode SendDelete(string apiUrl)
-        {
-            LogService.Info($"SolrClient.SendDelete - ApiPath: {apiUrl}");
-
-            ApiClient.InnerClient.DefaultRequestHeaders.Clear();
-            using (var res = Task.Run(() => ApiClient.InnerClient.DeleteAsync(apiUrl)))
-            {
-                res.Wait();
-                var status = res.Result.StatusCode;
-                LogService.Debug($"SolrClient.SendDelete - Response: {status}");
-
-                return status;
             }
         }
     }

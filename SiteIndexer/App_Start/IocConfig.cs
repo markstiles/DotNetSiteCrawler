@@ -6,6 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 using SiteIndexer.Controllers;
 using SiteIndexer.Factories;
 using SiteIndexer.Services.Solr;
+using SiteIndexer.Services.System;
+using SiteIndexer.Services.Configuration;
+using SiteIndexer.Services.Crawling;
+using SiteIndexer.Services.Indexing;
 
 namespace SiteIndexer
 {
@@ -27,12 +31,13 @@ namespace SiteIndexer
             services.AddTransient<ILogService, LogService>();
             services.AddTransient<ICacheService, CacheService>();
             services.AddTransient<ISolrApiService, SolrApiService>();
-            services.AddTransient<ISolrClient, SolrClient>();
-            services.AddTransient<IApiClient, ApiClient>();
+            services.AddSingleton<ISolrClient, SolrClient>();
             services.AddTransient<IConfigurationService, ConfigurationService>();
             services.AddTransient<IFileService, FileService>();
             services.AddTransient<ICrawlingService, CrawlingService>();
-            
+            services.AddTransient<IIndexingService, IndexingService>();
+            services.AddTransient<IStringService, StringService>();
+
             //factories
             //services.AddTransient<IIssueViewModelFactory, IssueViewModelFactory>();
         }

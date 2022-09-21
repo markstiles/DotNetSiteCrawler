@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Caching;
 
-namespace SiteIndexer.Services
+namespace SiteIndexer.Services.System
 {
     public interface ICacheService
     {

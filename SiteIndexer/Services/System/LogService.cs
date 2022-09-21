@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using log4net;
 
-namespace SiteIndexer.Services
+namespace SiteIndexer.Services.System
 {
     public interface ILogService
     {

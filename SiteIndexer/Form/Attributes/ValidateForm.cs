@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using SiteIndexer.Models;
-using SiteIndexer.Services;
+using SiteIndexer.Services.System;
 using Newtonsoft.Json;
 
 namespace SiteIndexer.Form.Attributes
