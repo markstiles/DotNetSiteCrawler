@@ -1,0 +1,28 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Site Indexer</title>
+    <link href="/assets/css/site.css?x=@(new System.Random().Next())" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <header>
+        <div class="navbar">
+            <ul>
+                <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                <li>@Html.ActionLink("Configs", "Index", "Configuration")</li>
+            </ul>
+        </div>
+    </header>
+    <div class="content">
+        @RenderBody()
+    </div>
+    <footer>
+        <p>&copy; @DateTime.Now.Year</p>
+    </footer>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="~/assets/js/home.js"></script>
+    <script src="~/assets/js/config.js"></script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+﻿@{
+    ViewBag.Title = "Configuration Page";
+}
+
+<div class="configurations">
+    <h1>Create a Configuration</h1>
+    <form class="form" method="post" action="/Configuration/CreateConfiguration">
+        <fieldset>
+            <div class="form-row">
+                <label for="project-name">Project Name</label>
+                <input type="text" id="project-name" class="project-name" />
+            </div>
+            <div class="form-row">
+                <label for="jira-url">JIRA URL</label>
+                <input type="text" id="jira-url" class="jira-url" value="https://velirs.atlassian.net" />
+            </div>
+            <div class="form-row">
+                <label for="jira-project-code">JIRA Project Code</label>
+                <input type="text" id="jira-project-code" class="jira-project-code" />
+            </div>
+            <div class="form-row">
+                <label for="mavenlink-workspace-id">Mavenlink Workspace ID</label>
+                <input type="text" id="mavenlink-workspace-id" class="mavenlink-workspace-id" />
+            </div>
+            <button class="config-submit scButton">Submit</button>
+        </fieldset>
+    </form>
+    <div class="submit-success">
+        The configuration was saved successfully!
+    </div>
+    <div class="submit-failure">
+        The configuration failed to save.
+    </div>
+    @Html.Partial("/Views/Shared/_ProgressIndicator.cshtml")
+</div>
