@@ -29,3 +29,4 @@ button:hover {  }
 .tooltip { border-radius: 10px; position: absolute; right: 6px; border: 1px solid #ccc; height: 10px; width: 10px; font-size: 10px; top: 5px; background:#fff; }
 .tooltip::after { content:"i"; }
 .tooltip-message { display: none; position: absolute; top: 0px; left: 0px; width: 200px; background: #fff; border: 1px solid #ccc; border-radius: 3px; padding: 4px 5px; z-index: 9; }
+.job-messages { height: 200px; border: 1px solid #ccc; overflow: auto; border-radius: 5px; }

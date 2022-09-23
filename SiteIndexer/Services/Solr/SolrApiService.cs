@@ -12,6 +12,7 @@ namespace SiteIndexer.Services.Solr
         SolrUpdateResponseApiModel AddDocuments(List<SolrDocumentApiModel> models);
         SolrUpdateResponseApiModel DeleteDocuments(List<SolrDocumentApiModel> models);
         SolrUpdateResponseApiModel DeleteDocumentsByQuery(string solrQuery);
+        SolrUpdateResponseApiModel DeleteAllDocuments();
     }
 
     public class SolrApiService : ISolrApiService
@@ -53,6 +54,15 @@ namespace SiteIndexer.Services.Solr
         {
             var apiUrl = $"/solr/{SolrCore}/update?commit=true";
             var deleteModel = new DeleteQueryApiModel(solrQuery);
+            var response = Client.SendPost<SolrUpdateResponseApiModel>(apiUrl, deleteModel);
+
+            return response;
+        }
+
+        public SolrUpdateResponseApiModel DeleteAllDocuments()
+        {
+            var apiUrl = $"/solr/{SolrCore}/update?commit=true";
+            var deleteModel = new DeleteQueryApiModel("*:*");
             var response = Client.SendPost<SolrUpdateResponseApiModel>(apiUrl, deleteModel);
 
             return response;

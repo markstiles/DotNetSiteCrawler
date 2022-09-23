@@ -22,6 +22,9 @@ using System.Net.Http.Headers;
 using SiteIndexer.Services.Solr.Models;
 using SiteIndexer.Services.System;
 using SiteIndexer.Services.Indexing;
+using System.Threading;
+using SiteIndexer.Services.Jobs.Models;
+using SiteIndexer.Services.Jobs;
 
 namespace SiteIndexer.Controllers
 {
@@ -34,19 +37,22 @@ namespace SiteIndexer.Controllers
         protected readonly ICrawlingService CrawlingService;
         protected readonly IStringService StringService;
         protected readonly IIndexingService IndexingService;
+        protected readonly IJobService JobService;
 
         public IndexingController(
             IConfigurationService configurationService, 
             ISolrApiService solrApiService,
             ICrawlingService crawlingService,
             IStringService stringService,
-            IIndexingService indexingService)
+            IIndexingService indexingService,
+            IJobService jobService)
         {
             ConfigurationService = configurationService;
             SolrApiService = solrApiService;
             CrawlingService = crawlingService;
             StringService = stringService;
             IndexingService = indexingService;
+            JobService = jobService;
         }
 
         #endregion
@@ -56,6 +62,32 @@ namespace SiteIndexer.Controllers
         [HttpPost]
         [ValidateForm]
         public ActionResult Start()
+        {
+            //TODO break this into a thread so you can respond to the UI and then get status updates
+            var handleName = JobService.StartJob(ProcessConfiguration);
+            
+            var result = new TransactionResult<object>
+            {
+                Succeeded = true,
+                ReturnValue = handleName,
+                ErrorMessage = string.Empty
+            };
+
+            return Json(result);
+        }
+
+        [HttpPost]
+        public ActionResult GetJobStatus(string handleName, DateTime lastDateReceived)
+        {
+            //build a custom singleton job manager than handles threads
+            var status = JobService.GetJobStatus(handleName, lastDateReceived);
+
+            return Json(new { JobStatus = status });
+        }
+
+        #endregion
+
+        public void ProcessConfiguration(MessageList messages)
         {
             //TODO make the start domain come from configuration list
             var domainList = new List<string>
@@ -68,12 +100,13 @@ namespace SiteIndexer.Controllers
             var isIndexed = new Dictionary<string, Uri>();
             foreach (var domain in domainList)
             {
+                messages.Add($"Starting to crawl: {domain}");
                 var startUri = new Uri($"{domain}/");
                 var toIndex = new Dictionary<string, Uri>
                 {
                     { StringService.GetValidKey(startUri), startUri }
                 };
-                
+
                 while (toIndex.Count > 0)
                 {
                     var firstEntry = toIndex.First();
@@ -85,37 +118,28 @@ namespace SiteIndexer.Controllers
 
                     //query page for content
                     var html = CrawlingService.GetHtml(currentUri);
-             
+
                     //gather all the links and determine what has been crawled or not
                     var validLinks = CrawlingService.GetValidLinks(html, currentUri);
-                    foreach(var uri in validLinks)
+                    foreach (var uri in validLinks)
                     {
                         var validKey = StringService.GetValidKey(uri);
                         if (toIndex.ContainsKey(validKey) || isIndexed.ContainsKey(validKey))
                             continue;
-                        
+
                         toIndex.Add(validKey, uri);
                     }
-                    
+
                     //TODO batch update items so there aren't so many calls
                     //index item
                     IndexingService.IndexItem(html, currentUri, updatedDate);
+
+                    messages.Add($"Crawled: {isIndexed.Count} - Found: {toIndex.Count}");
                 }
             }
 
             //remove anything from solr that wasn't updated
             SolrApiService.DeleteDocumentsByQuery($"-updated:{updatedDate}");
-
-            var result = new TransactionResult<object>
-            {
-                Succeeded = true,
-                ReturnValue = new { links = isIndexed },
-                ErrorMessage = string.Empty
-            };
-
-            return Json(result);
         }
-
-        #endregion
     }
 }

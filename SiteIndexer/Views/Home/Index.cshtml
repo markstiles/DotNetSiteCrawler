@@ -8,16 +8,11 @@
 
 <div class="indexing">
     <h2>Indexing</h2>
-    <form class="form" method="post" action="/Indexing/Start">
+    <form class="form" method="post" action="/Indexing/Start" status="/Indexing/GetJobStatus">
         <fieldset>
             <button class="submit scButton">Start Indexing</button>
         </fieldset>
     </form>
-    <div class="submit-success">
-        The indexing was successful!
-    </div>
-    <div class="submit-failure">
-        The indexing failed.
-    </div>
+    <div class="job-messages"></div>
     @Html.Partial("/Views/Shared/_ProgressIndicator.cshtml")
 </div>

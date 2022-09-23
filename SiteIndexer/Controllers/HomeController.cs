@@ -20,11 +20,8 @@ namespace SiteIndexer.Controllers
         //site groupings
         //connection settings
         //which url extensions are skipped or allowed
-        
+
         //then configure a single crawl
         //have a way of using two indexes to prevent and index from going down while crawling
-        //scrape first page and look for all anchors, add them to dictionary with flag set to crawled or not
-        //pull out metadata and content
-        //push it into solr
     }
 }

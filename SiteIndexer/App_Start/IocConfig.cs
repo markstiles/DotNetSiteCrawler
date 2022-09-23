@@ -10,6 +10,7 @@ using SiteIndexer.Services.System;
 using SiteIndexer.Services.Configuration;
 using SiteIndexer.Services.Crawling;
 using SiteIndexer.Services.Indexing;
+using SiteIndexer.Services.Jobs;
 
 namespace SiteIndexer
 {
@@ -37,6 +38,7 @@ namespace SiteIndexer
             services.AddTransient<ICrawlingService, CrawlingService>();
             services.AddTransient<IIndexingService, IndexingService>();
             services.AddTransient<IStringService, StringService>();
+            services.AddSingleton<IJobService, JobService>();
 
             //factories
             //services.AddTransient<IIssueViewModelFactory, IssueViewModelFactory>();
