@@ -102,7 +102,8 @@ namespace SiteIndexer.Controllers
         [HttpPost]
         public ActionResult Search(string query)
         {
-            var response = SolrApiService.SearchDocuments<DocApiModel>($"title:{query} or content:{query}");
+            var searchQuery = string.IsNullOrWhiteSpace(query) ? "*:*" : query;
+            var response = SolrApiService.SearchDocuments<DocApiModel>($"title:{searchQuery} or content:{searchQuery}");
 
             var result = new TransactionResult<DocApiModel[]>
             {

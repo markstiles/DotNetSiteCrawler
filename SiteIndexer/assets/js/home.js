@@ -44,9 +44,8 @@ jQuery(document).ready(function ()
                         for (let i = 0; i < messages.length; i++)
                         {
                             var m = messages[i];
-                            jQuery(jobMessages).append("<div class='message'>" + m + "</div>");
+                            jQuery(jobMessages).prepend("<div class='message'>" + m + "</div>");
                         }
-                        jQuery(jobMessages).scrollTop(jQuery(jobMessages).height());
                     },
                     function (jobStatus)
                     {
