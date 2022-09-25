@@ -13,6 +13,7 @@ namespace SiteIndexer.Services.Solr
         SolrUpdateResponseApiModel DeleteDocuments(List<SolrDocumentApiModel> models);
         SolrUpdateResponseApiModel DeleteDocumentsByQuery(string solrQuery);
         SolrUpdateResponseApiModel DeleteAllDocuments();
+        SolrQueryResponseApiModel<T> SearchDocuments<T>(string query, int rows = 10);
     }
 
     public class SolrApiService : ISolrApiService
@@ -41,7 +42,7 @@ namespace SiteIndexer.Services.Solr
             return response;
         }
 
-        public SolrUpdateResponseApiModel DeleteDocuments(List<SolrDocumentApiModel> models) 
+        public SolrUpdateResponseApiModel DeleteDocuments(List<SolrDocumentApiModel> models)
         {
             var apiUrl = $"/solr/{SolrCore}/update?commit=true";
             var deleteModel = new DeleteDocumentsApiModel(models);
@@ -64,6 +65,14 @@ namespace SiteIndexer.Services.Solr
             var apiUrl = $"/solr/{SolrCore}/update?commit=true";
             var deleteModel = new DeleteQueryApiModel("*:*");
             var response = Client.SendPost<SolrUpdateResponseApiModel>(apiUrl, deleteModel);
+
+            return response;
+        }
+
+        public SolrQueryResponseApiModel<T> SearchDocuments<T>(string query, int rows = 10)
+        {
+            var apiUrl = $"/solr/{SolrCore}/select?q={query}&rows={rows}";
+            var response = Client.SendGet<SolrQueryResponseApiModel<T>>(apiUrl);
 
             return response;
         }

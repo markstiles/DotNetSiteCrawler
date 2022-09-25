@@ -5,10 +5,18 @@ jQuery(document).ready(function ()
     //form
     var indexingForm = ".indexing .form";
     var indexingFormSubmit = indexingForm + " .submit";
-    var indexingProgressIndicator = indexingForm + " .progress-indicator";
-    var indexingSubmitSuccess = indexingForm + " .submit-success";
-    var indexingSubmitFailure = indexingForm + " .submit-failure";
+    var indexingProgressIndicator = ".indexing .progress-indicator";
     var jobMessages = ".job-messages";
+
+    //empty index
+    var emptyFormSubmit = indexingForm + " .empty-submit";
+    var emptyFormSuccess = indexingForm + " .empty-success";
+    var emptyFormFailure = indexingForm + " .empty-failure";
+
+    //search form
+    var searchForm = ".indexing .search-form";
+    var searchFormSubmit = searchForm + " .submit";
+    var searchResults = ".search-results";
 
     jQuery(indexingFormSubmit).click(function (e)
     {
@@ -19,11 +27,6 @@ jQuery(document).ready(function ()
 
     function StartIndexing()
     {
-        //var projectNameValue = jQuery(indexingForm + " .project-name").val();
-        //var jiraUrlValue = jQuery(configForm + " .jira-url").val();
-        //var jiraProjectCodeValue = jQuery(configForm + " .jira-project-code").val();
-        //var mavenlinkWorkspaceIdValue = jQuery(configForm + " .mavenlink-workspace-id").val();
-
         jQuery(jobMessages).html("");
         jQuery(indexingProgressIndicator).show();
         jQuery(indexingSubmitSuccess).hide();
@@ -52,6 +55,72 @@ jQuery(document).ready(function ()
                 }
             )
         });
+    }
+
+    jQuery(emptyFormSubmit).click(function (e)
+    {
+        e.preventDefault();
+
+        EmptyIndex();
+    });
+
+    function EmptyIndex() {
+        jQuery(indexingProgressIndicator).show();
+        jQuery(emptyFormSuccess).hide();
+        jQuery(emptyFormFailure).hide();
+
+        jQuery.post(jQuery(indexingForm).attr("empty"), {})
+        .done(function (r)
+        {
+            jQuery(indexingProgressIndicator).hide();
+            if (r.Succeeded)
+            {
+                jQuery(emptyFormSuccess).show();
+            }
+            else {
+                jQuery(emptyFormFailure).show();
+            }
+        });
+    } 
+
+    jQuery(searchFormSubmit).click(function (e)
+    {
+        e.preventDefault();
+
+        SearchIndex();
+    });
+
+    function SearchIndex()
+    {
+        var queryValue = jQuery(searchForm + " .query").val();
+        jQuery(indexingProgressIndicator).show();
+        jQuery(searchResults).html("");
+
+        jQuery.post(jQuery(searchForm).attr("action"),
+            {
+                query: queryValue
+            })
+            .done(function (r)
+            {
+                jQuery(indexingProgressIndicator).hide();
+                if (r.Succeeded)
+                {
+                    for (let i = 0; i < r.ReturnValue.length; i++)
+                    {
+                        var result = r.ReturnValue[i];
+                        var output = "<div class='result'>";
+                        output += "<div class='title'>" + result.title[0] + "</div>";
+                        output += "<div class='description'>" + result.content[0].slice(0, 100) + "...</div>";
+                        output += "<div class='url'><a href='" + result.url[0] + "' target='_blank'>" + result.url[0] + "</a></div>";
+                        output += "</div>";
+                        jQuery(searchResults).append(output);
+                    }                    
+                }
+                else
+                {
+                    jQuery(indexingEmptyFailure).show();
+                }
+            });
     }
 });
 

@@ -7,12 +7,23 @@
 </div>
 
 <div class="indexing">
-    <h2>Indexing</h2>
-    <form class="form" method="post" action="/Indexing/Start" status="/Indexing/GetJobStatus">
+    <form class="form" method="post" action="/Indexing/Start" status="/Indexing/GetJobStatus" empty="/Indexing/EmptyIndex">
         <fieldset>
             <button class="submit scButton">Start Indexing</button>
+            <button class="empty-submit scButton">Empty Indexing</button>
         </fieldset>
     </form>
     <div class="job-messages"></div>
+    <div class="empty-messages">
+        <div class="empty-success"></div>
+        <div class="empty-failure"></div>
+    </div>
+    <form class="search-form" method="post" action="/Indexing/Search">
+        <fieldset>
+            <input type="text" class="query" />
+            <button class="submit scButton">Search Index</button>
+        </fieldset>
+    </form>
+    <div class="search-results"></div>
     @Html.Partial("/Views/Shared/_ProgressIndicator.cshtml")
 </div>

@@ -79,10 +79,39 @@ namespace SiteIndexer.Controllers
         [HttpPost]
         public ActionResult GetJobStatus(string handleName, DateTime lastDateReceived)
         {
-            //build a custom singleton job manager than handles threads
             var status = JobService.GetJobStatus(handleName, lastDateReceived);
 
             return Json(new { JobStatus = status });
+        }
+
+        [HttpPost]
+        public ActionResult EmptyIndex()
+        {
+            var response = SolrApiService.DeleteAllDocuments();
+
+            var result = new TransactionResult<SolrUpdateResponseApiModel>
+            {
+                Succeeded = true,
+                ReturnValue = response,
+                ErrorMessage = string.Empty
+            };
+
+            return Json(result);
+        }
+
+        [HttpPost]
+        public ActionResult Search(string query)
+        {
+            var response = SolrApiService.SearchDocuments<DocApiModel>($"title:{query} or content:{query}");
+
+            var result = new TransactionResult<DocApiModel[]>
+            {
+                Succeeded = true,
+                ReturnValue = response.response.docs,
+                ErrorMessage = string.Empty
+            };
+
+            return Json(result);
         }
 
         #endregion

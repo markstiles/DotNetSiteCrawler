@@ -45,8 +45,9 @@ namespace SiteIndexer.Services.Indexing
                 foreach (char c in charArr)
                 {
                     //TODO need to break this into two parts, one field for searching and one field for result display
-                    if (!char.IsLetter(c))
+                    if (!char.IsLetter(c) || !char.IsWhiteSpace(c))
                         continue;
+
                     sb.Append(c);
                 }
 

@@ -220,9 +220,13 @@
     <Compile Include="Services\Jobs\Models\JobStatus.cs" />
     <Compile Include="Services\Jobs\Models\Job.cs" />
     <Compile Include="Services\Jobs\Models\MessageList.cs" />
+    <Compile Include="Services\Solr\Models\DocApiModel.cs" />
+    <Compile Include="Services\Solr\Models\ParamsApiModel.cs" />
     <Compile Include="Services\Solr\Models\QueryApiModel.cs" />
     <Compile Include="Services\Solr\Models\DeleteQueryApiModel.cs" />
     <Compile Include="Services\Solr\Models\DeleteDocumentsApiModel.cs" />
+    <Compile Include="Services\Solr\Models\ResponseApiModel.cs" />
+    <Compile Include="Services\Solr\Models\SolrUpdateResponseApiModel.cs" />
     <Compile Include="Services\System\CacheService.cs" />
     <Compile Include="Services\Configuration\ConfigurationService.cs" />
     <Compile Include="Services\Crawling\CrawlingService.cs" />
@@ -233,7 +237,7 @@
     <Compile Include="Services\Solr\Models\SolrDocumentApiModel.cs" />
     <Compile Include="Services\Solr\SolrApiService.cs" />
     <Compile Include="Services\Solr\SolrClient.cs" />
-    <Compile Include="Services\Solr\Models\SolrUpdateResponseApiModel.cs" />
+    <Compile Include="Services\Solr\Models\SolrQueryResponseApiModel.cs" />
     <Compile Include="Services\Configuration\Models\ConfigurationModel.cs" />
     <Compile Include="Settings.cs" />
   </ItemGroup>

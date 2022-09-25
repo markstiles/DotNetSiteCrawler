@@ -9,5 +9,6 @@ namespace SiteIndexer.Services.Solr.Models
     {
         public int status { get; set; }
         public int QTime { get; set; }
+        public ParamsApiModel _params { get; set; }
     }
 }

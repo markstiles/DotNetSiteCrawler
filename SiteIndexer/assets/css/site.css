@@ -30,3 +30,8 @@ button:hover {  }
 .tooltip::after { content:"i"; }
 .tooltip-message { display: none; position: absolute; top: 0px; left: 0px; width: 200px; background: #fff; border: 1px solid #ccc; border-radius: 3px; padding: 4px 5px; z-index: 9; }
 .job-messages { height: 200px; border: 1px solid #ccc; overflow: auto; border-radius: 5px; }
+.search-results { height: 200px; border: 1px solid #ccc; overflow: auto; border-radius: 5px; }
+.result { margin: 10px; padding: 5px; border-radius: 5px; border: 1px solid #ccc; }
+.result .title { font-weight:bold; font-size:16px; margin-bottom:2px; }
+.result .description { font-size:14px; margin-bottom:4px; }
+.result .url { text-decoration:underline; color: blue; font-size:12px; }
