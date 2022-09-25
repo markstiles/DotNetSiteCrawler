@@ -29,32 +29,31 @@ jQuery(document).ready(function ()
     {
         jQuery(jobMessages).html("");
         jQuery(indexingProgressIndicator).show();
-        jQuery(indexingSubmitSuccess).hide();
-        jQuery(indexingSubmitFailure).hide();
                 
-        jQuery.post(jQuery(indexingForm).attr("action"),{}
-        ).done(function (jobResult)
-        {
-            var lastDate = new Date()
-            lastDate.setDate(lastDate.getDate() - 1)
+        jQuery.post(jQuery(indexingForm).attr("action"), {})
+            .done(function (jobResult)
+            {
+                jQuery(indexingProgressIndicator).hide();
+                var lastDate = new Date()
+                lastDate.setDate(lastDate.getDate() - 1)
 
-            CheckStatus(jobResult, jQuery(indexingForm).attr("status"), lastDate,
-                function (jobStatus)
-                {
-                    var messages = jobStatus.Messages;
-                    for (let i = 0; i < messages.length; i++)
+                CheckStatus(jobResult, jQuery(indexingForm).attr("status"), lastDate,
+                    function (jobStatus)
                     {
-                        var m = messages[i];
-                        jQuery(jobMessages).append("<div class='message'>" + m + "</div>");
+                        var messages = jobStatus.Messages;
+                        for (let i = 0; i < messages.length; i++)
+                        {
+                            var m = messages[i];
+                            jQuery(jobMessages).append("<div class='message'>" + m + "</div>");
+                        }
+                        jQuery(jobMessages).scrollTop(jQuery(jobMessages).height());
+                    },
+                    function (jobStatus)
+                    {
+                        jQuery(".progress-indicator").hide();
                     }
-                    jQuery(jobMessages).scrollTop(jQuery(jobMessages).height());
-                },
-                function (jobStatus)
-                {
-                    jQuery(".progress-indicator").hide();
-                }
-            )
-        });
+                )
+            });
     }
 
     jQuery(emptyFormSubmit).click(function (e)
