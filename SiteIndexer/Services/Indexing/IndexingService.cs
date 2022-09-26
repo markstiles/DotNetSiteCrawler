@@ -44,7 +44,6 @@ namespace SiteIndexer.Services.Indexing
                 StringBuilder sb = new StringBuilder();
                 foreach (char c in charArr)
                 {
-                    //TODO need to break this into two parts, one field for searching and one field for result display
                     if (!char.IsLetter(c) && !char.IsWhiteSpace(c))
                         continue;
 

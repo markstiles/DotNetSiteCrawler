@@ -63,7 +63,6 @@ namespace SiteIndexer.Controllers
         [ValidateForm]
         public ActionResult Start(Guid CrawlerId)
         {
-            //TODO break this into a thread so you can respond to the UI and then get status updates
             var handleName = JobService.StartJob(CrawlerId, ProcessConfiguration);
             
             var result = new TransactionResult<object>
@@ -104,9 +103,8 @@ namespace SiteIndexer.Controllers
         public ActionResult Search(Guid solrConnectionId, string query)
         {
             var config = ConfigurationService.GetSolrConnection(solrConnectionId);
-            var response = SolrApiService.SearchDocuments<DocApiModel>(config.Url, config.Core, $"title:{query} or content:{query}");
             var searchQuery = string.IsNullOrWhiteSpace(query) ? "*:*" : query;
-            var response = SolrApiService.SearchDocuments<DocApiModel>($"title:{searchQuery} or content:{searchQuery}");
+            var response = SolrApiService.SearchDocuments<DocApiModel>(config.Url, config.Core, $"title:{searchQuery} or content:{searchQuery}");
 
             var result = new TransactionResult<DocApiModel[]>
             {
@@ -125,11 +123,6 @@ namespace SiteIndexer.Controllers
             var config = ConfigurationService.GetCrawler(crawlerId);
             var domainList = config.Sites.Select(a => ConfigurationService.GetSite(a).Url).ToList();
             var solrConfig = ConfigurationService.GetSolrConnection(config.SolrConnection);
-            //new List<string>
-            //{
-            //    "https://markstiles.net",
-            //    "http://projectinsights.local"
-            //};
             var updatedDate = DateTime.Now.ToString("yyy-MM-ddThh:mm:ssZ");
 
             var isIndexed = new Dictionary<string, Uri>();
