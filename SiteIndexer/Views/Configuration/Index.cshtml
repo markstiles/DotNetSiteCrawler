@@ -3,33 +3,92 @@
 }
 
 <div class="configurations">
-    <h1>Create a Configuration</h1>
-    <form class="form" method="post" action="/Configuration/CreateConfiguration">
-        <fieldset>
-            <div class="form-row">
-                <label for="project-name">Project Name</label>
-                <input type="text" id="project-name" class="project-name" />
-            </div>
-            <div class="form-row">
-                <label for="jira-url">JIRA URL</label>
-                <input type="text" id="jira-url" class="jira-url" value="https://velirs.atlassian.net" />
-            </div>
-            <div class="form-row">
-                <label for="jira-project-code">JIRA Project Code</label>
-                <input type="text" id="jira-project-code" class="jira-project-code" />
-            </div>
-            <div class="form-row">
-                <label for="mavenlink-workspace-id">Mavenlink Workspace ID</label>
-                <input type="text" id="mavenlink-workspace-id" class="mavenlink-workspace-id" />
-            </div>
-            <button class="config-submit scButton">Submit</button>
-        </fieldset>
-    </form>
-    <div class="submit-success">
-        The configuration was saved successfully!
+    <div class="solr-config">
+        <h2>Create a Solr Connection</h2>
+        <form class="form" method="post" action="/Configuration/CreateSolrConfiguration" test="/Configuration/TestSolrConfiguration">
+            <fieldset>
+                <div class="form-row">
+                    <label for="solr-url">Solr Url</label>
+                    <input type="text" id="solr-url" class="solr-url" />
+                </div>
+                <div class="form-row">
+                    <label for="solr-core">Solr Core</label>
+                    <input type="text" id="solr-core" class="solr-core" />
+                </div>
+                <button class="solr-test scButton">Test Connection</button>
+                <button class="solr-submit scButton">Save Connection</button>
+            </fieldset>
+        </form>
+        <div class="test-success">
+            The Solr connection was tested successfully!
+        </div>
+        <div class="test-failure">
+            The Solr connection test failed.
+        </div>
+        <div class="submit-success">
+            The Solr connection was saved successfully!
+        </div>
+        <div class="submit-failure">
+            The Solr connection failed to save.
+        </div>
     </div>
-    <div class="submit-failure">
-        The configuration failed to save.
+    <div class="site-config">
+        <h2>Add Sites</h2>
+        <form class="form" method="post" action="/Configuration/CreateSiteConfiguration">
+            <fieldset>
+                <div class="form-row">
+                    <label for="site-url">Site Url</label>
+                    <input type="text" id="site-url" class="site-url" />
+                </div>
+                <button class="site-submit scButton">Save Site</button>
+            </fieldset>
+        </form>
+        <div class="submit-success">
+            The Site was saved successfully!
+        </div>
+        <div class="submit-failure">
+            The Site failed to save.
+        </div>
+    </div>
+    <div class="crawler-config">
+        <h2>Create an Crawler</h2>
+        <form class="form" method="post" action="/Configuration/CreateCrawlingConfiguration">
+            <fieldset>
+                <div class="form-row">
+                    <label for="crawler-name">Crawler Name</label>
+                    <input type="text" id="crawler-name" class="crawler-name" />
+                </div>
+                <div class="form-row">
+                    <label for="solr-connection">Solr Connection</label>
+                    <select id="solr-connection" class="solr-connection">
+                        @foreach(var sc in Model.SolrConnections)
+                        {
+                            <option value="@sc.Id">@sc.Url</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label for="site-list">Sites to Crawl</label>
+                    <div class="sites">
+                        @for (var i = 0; i < Model.Sites.Count; i++)
+                        {
+                            var site = Model.Sites[i];
+                            <div class="form-group">
+                                <input type="checkbox" id="site-@i" value="@site.Id" />
+                                <label for="site-@i">@site.Url</label>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <button class="crawler-submit scButton">Save Crawler</button>
+            </fieldset>
+        </form>
+        <div class="submit-success">
+            The crawler was saved successfully!
+        </div>
+        <div class="submit-failure">
+            The crawler failed to save.
+        </div>
     </div>
     @Html.Partial("/Views/Shared/_ProgressIndicator.cshtml")
 </div>

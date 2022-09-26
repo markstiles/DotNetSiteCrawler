@@ -9,7 +9,7 @@ namespace SiteIndexer.Services.Jobs
 {
     public interface IJobService
     {
-        string StartJob(Action<MessageList> jobFunction);
+        string StartJob(Guid crawlerId, Action<Guid, MessageList> jobFunction);
         void FinishJob(Job job);
         JobStatus GetJobStatus(string jobHandle, DateTime lastDateReceived);
     }
@@ -25,12 +25,12 @@ namespace SiteIndexer.Services.Jobs
 
         }
 
-        public string StartJob(Action<MessageList> jobFunction)
+        public string StartJob(Guid crawlerId, Action<Guid, MessageList> jobFunction)
         {
             lock (lockObject)
             {
                 var jobHandle = Guid.NewGuid().ToString();
-                var j = new Job(jobHandle, jobFunction);
+                var j = new Job(jobHandle, crawlerId, jobFunction);
                 var jobThread = new Thread(() => j.Run(this));
                 jobThread.Start();
                 RunningJobs.Add(jobHandle, j);

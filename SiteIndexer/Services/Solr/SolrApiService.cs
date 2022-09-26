@@ -9,11 +9,11 @@ namespace SiteIndexer.Services.Solr
 {
     public interface ISolrApiService
     {
-        SolrUpdateResponseApiModel AddDocuments(List<SolrDocumentApiModel> models);
-        SolrUpdateResponseApiModel DeleteDocuments(List<SolrDocumentApiModel> models);
-        SolrUpdateResponseApiModel DeleteDocumentsByQuery(string solrQuery);
-        SolrUpdateResponseApiModel DeleteAllDocuments();
-        SolrQueryResponseApiModel<T> SearchDocuments<T>(string query, int rows = 10);
+        SolrUpdateResponseApiModel AddDocuments(string url, string core, List<SolrDocumentApiModel> models);
+        SolrUpdateResponseApiModel DeleteDocuments(string url, string core, List<SolrDocumentApiModel> models);
+        SolrUpdateResponseApiModel DeleteDocumentsByQuery(string url, string core, string solrQuery);
+        SolrUpdateResponseApiModel DeleteAllDocuments(string url, string core);
+        SolrQueryResponseApiModel<T> SearchDocuments<T>(string url, string core, string query, int rows = 10);
     }
 
     public class SolrApiService : ISolrApiService
@@ -26,52 +26,50 @@ namespace SiteIndexer.Services.Solr
         public SolrApiService(ISolrClient client)
         {
             Client = client;
-            //TODO move this to config
-            SolrCore = "webcrawl";
         }
 
         #endregion
 
         #region Context
 
-        public SolrUpdateResponseApiModel AddDocuments(List<SolrDocumentApiModel> models)
+        public SolrUpdateResponseApiModel AddDocuments(string url, string core, List<SolrDocumentApiModel> models)
         {
-            var apiUrl = $"/solr/{SolrCore}/update?commitWithin=1000";
+            var apiUrl = $"{url}/solr/{core}/update?commitWithin=1000";
             var response = Client.SendPost<SolrUpdateResponseApiModel>(apiUrl, models);
 
             return response;
         }
 
-        public SolrUpdateResponseApiModel DeleteDocuments(List<SolrDocumentApiModel> models)
+        public SolrUpdateResponseApiModel DeleteDocuments(string url, string core, List<SolrDocumentApiModel> models)
         {
-            var apiUrl = $"/solr/{SolrCore}/update?commit=true";
+            var apiUrl = $"{url}/solr/{core}/update?commit=true";
             var deleteModel = new DeleteDocumentsApiModel(models);
             var response = Client.SendPost<SolrUpdateResponseApiModel>(apiUrl, deleteModel);
 
             return response;
         }
 
-        public SolrUpdateResponseApiModel DeleteDocumentsByQuery(string solrQuery)
+        public SolrUpdateResponseApiModel DeleteDocumentsByQuery(string url, string core, string solrQuery)
         {
-            var apiUrl = $"/solr/{SolrCore}/update?commit=true";
+            var apiUrl = $"{url}/solr/{core}/update?commit=true";
             var deleteModel = new DeleteQueryApiModel(solrQuery);
             var response = Client.SendPost<SolrUpdateResponseApiModel>(apiUrl, deleteModel);
 
             return response;
         }
 
-        public SolrUpdateResponseApiModel DeleteAllDocuments()
+        public SolrUpdateResponseApiModel DeleteAllDocuments(string url, string core)
         {
-            var apiUrl = $"/solr/{SolrCore}/update?commit=true";
+            var apiUrl = $"{url}/solr/{core}/update?commit=true";
             var deleteModel = new DeleteQueryApiModel("*:*");
             var response = Client.SendPost<SolrUpdateResponseApiModel>(apiUrl, deleteModel);
 
             return response;
         }
 
-        public SolrQueryResponseApiModel<T> SearchDocuments<T>(string query, int rows = 10)
+        public SolrQueryResponseApiModel<T> SearchDocuments<T>(string url, string core, string query, int rows = 10)
         {
-            var apiUrl = $"/solr/{SolrCore}/select?q={query}&rows={rows}";
+            var apiUrl = $"{url}/solr/{core}/select?q={query}&rows={rows}";
             var response = Client.SendGet<SolrQueryResponseApiModel<T>>(apiUrl);
 
             return response;

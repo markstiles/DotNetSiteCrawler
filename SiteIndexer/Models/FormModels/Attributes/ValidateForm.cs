@@ -8,7 +8,7 @@ using SiteIndexer.Models;
 using SiteIndexer.Services.System;
 using Newtonsoft.Json;
 
-namespace SiteIndexer.Form.Attributes
+namespace SiteIndexer.Models.FormModels.Attributes
 {
     public class ValidateForm : ActionFilterAttribute
     {

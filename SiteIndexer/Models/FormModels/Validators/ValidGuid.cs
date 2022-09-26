@@ -6,9 +6,9 @@ using System.Reflection;
 using System.Web;
 using System.Web.Mvc;
 
-namespace SiteIndexer.Form.Validators
+namespace SiteIndexer.Models.FormModels.Validators
 {
-    public class ValidLong : ValidationAttribute
+    public class ValidGuid : ValidationAttribute
     {
         protected override ValidationResult IsValid(Object value, ValidationContext validationContext)
         {
@@ -32,8 +32,8 @@ namespace SiteIndexer.Form.Validators
 
             try
             {
-                var l = (long)value;
-                isCorrectValue = l >= 0;
+                var g = (Guid)value;
+                isCorrectValue = !g.Equals(Guid.Empty);
             }
             catch
             {

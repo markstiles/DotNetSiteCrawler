@@ -17,6 +17,7 @@ jQuery(document).ready(function ()
     var searchForm = ".indexing .search-form";
     var searchFormSubmit = searchForm + " .submit";
     var searchResults = ".search-results";
+    var searchFormFailure = searchForm + " .search-failure";
 
     jQuery(indexingFormSubmit).click(function (e)
     {
@@ -27,33 +28,37 @@ jQuery(document).ready(function ()
 
     function StartIndexing()
     {
+        var crawlerIdValue = jQuery(indexingForm + " .crawler").val();
         jQuery(jobMessages).html("");
         jQuery(indexingProgressIndicator).show();
                 
-        jQuery.post(jQuery(indexingForm).attr("action"), {})
-            .done(function (jobResult)
-            {
-                jQuery(indexingProgressIndicator).hide();
-                var lastDate = new Date()
-                lastDate.setDate(lastDate.getDate() - 1)
+        jQuery.post(jQuery(indexingForm).attr("action"),
+        {
+            CrawlerId: crawlerIdValue
+        }
+        ).done(function (jobResult)
+        {
+            jQuery(indexingProgressIndicator).hide();
+            var lastDate = new Date()
+            lastDate.setDate(lastDate.getDate() - 1)
 
-                CheckStatus(jobResult, jQuery(indexingForm).attr("status"), lastDate,
-                    function (jobStatus)
+            CheckStatus(jobResult, jQuery(indexingForm).attr("status"), lastDate,
+                function (jobStatus)
+                {
+                    var messages = jobStatus.Messages;
+                    for (let i = 0; i < messages.length; i++)
                     {
-                        var messages = jobStatus.Messages;
-                        for (let i = 0; i < messages.length; i++)
-                        {
-                            var m = messages[i];
-                            jQuery(jobMessages).append("<div class='message'>" + m + "</div>");
-                        }
-                        jQuery(jobMessages).scrollTop(jQuery(jobMessages).height());
-                    },
-                    function (jobStatus)
-                    {
-                        jQuery(".progress-indicator").hide();
+                        var m = messages[i];
+                        jQuery(jobMessages).append("<div class='message'>" + m + "</div>");
                     }
-                )
-            });
+                    jQuery(jobMessages).scrollTop(jQuery(jobMessages).height());
+                },
+                function (jobStatus)
+                {
+                    jQuery(".progress-indicator").hide();
+                }
+            )
+        });
     }
 
     jQuery(emptyFormSubmit).click(function (e)
@@ -91,12 +96,14 @@ jQuery(document).ready(function ()
 
     function SearchIndex()
     {
+        var solrConnectionIdValue = jQuery(searchForm + " .solr-connection").val();
         var queryValue = jQuery(searchForm + " .query").val();
         jQuery(indexingProgressIndicator).show();
         jQuery(searchResults).html("");
 
         jQuery.post(jQuery(searchForm).attr("action"),
             {
+                solrConnectionId: solrConnectionIdValue,
                 query: queryValue
             })
             .done(function (r)
@@ -117,7 +124,7 @@ jQuery(document).ready(function ()
                 }
                 else
                 {
-                    jQuery(indexingEmptyFailure).show();
+                    jQuery(searchFormFailure).show();
                 }
             });
     }

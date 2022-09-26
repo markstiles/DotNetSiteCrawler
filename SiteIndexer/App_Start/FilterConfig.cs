@@ -1,4 +1,4 @@
-﻿using SiteIndexer.Form.Attributes;
+﻿using SiteIndexer.Models.FormModels.Attributes;
 using SiteIndexer.Services;
 using System.Web;
 using System.Web.Mvc;

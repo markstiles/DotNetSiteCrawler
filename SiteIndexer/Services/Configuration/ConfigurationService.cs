@@ -12,50 +12,134 @@ namespace SiteIndexer.Services.Configuration
 {
     public interface IConfigurationService
     {
-        Dictionary<string, ConfigurationModel> Configurations { get; set; }
-
-        ConfigurationModel GetConfiguration(string projectName);
-        void CreateConfiguration(string projectNam);
+        SolrConnectionModel GetSolrConnection(Guid id);
+        List<SolrConnectionModel> GetSolrConnections();
+        SolrConnectionModel CreateSolrConnection(Guid id, string url, string core);
+        SiteModel GetSite(Guid id);
+        List<SiteModel> GetSites();
+        SiteModel CreateSite(Guid id, string url);
+        CrawlerModel GetCrawler(Guid id);
+        List<CrawlerModel> GetCrawlers();
+        CrawlerModel CreateCrawler(Guid id, string crawlerName, Guid solrConnectionId, List<Guid> siteIds);
     }
 
     public class ConfigurationService : IConfigurationService
     {
         #region Constructor
 
+        public Dictionary<Guid, SolrConnectionModel> SolrConnections { get; set; }
+        public Dictionary<Guid, SiteModel> Sites { get; set; }
+        public Dictionary<Guid, CrawlerModel> Crawlers { get; set; }
+
         protected IFileService FileService;
 
         public ConfigurationService(IFileService fileservice)
         {
             FileService = fileservice;
-            Configurations = new Dictionary<string, ConfigurationModel>();
+            SolrConnections = new Dictionary<Guid, SolrConnectionModel>();
+            Sites = new Dictionary<Guid, SiteModel>();
+            Crawlers = new Dictionary<Guid, CrawlerModel>();
 
-            var files = FileService.GetFiles("App_Data/configurations");
-            foreach(var f in files)
+            var solrFiles = FileService.GetFiles("App_Data/configurations/solr");
+            foreach(var f in solrFiles)
             {
-                var model = JsonConvert.DeserializeObject<ConfigurationModel>(f);
+                var model = JsonConvert.DeserializeObject<SolrConnectionModel>(f);
 
-                Configurations.Add(model.ProjectName, model);
+                SolrConnections.Add(model.Id, model);
+            }
+
+            var siteFiles = FileService.GetFiles("App_Data/configurations/sites");
+            foreach (var f in siteFiles)
+            {
+                var model = JsonConvert.DeserializeObject<SiteModel>(f);
+
+                Sites.Add(model.Id, model);
+            }
+
+            var crawlerFiles = FileService.GetFiles("App_Data/configurations/crawlers");
+            foreach (var f in crawlerFiles)
+            {
+                var model = JsonConvert.DeserializeObject<CrawlerModel>(f);
+
+                Crawlers.Add(model.Id, model);
             }
         }
 
         #endregion
 
-        public Dictionary<string, ConfigurationModel> Configurations { get; set; }
-
-        public ConfigurationModel GetConfiguration(string projectName)
+        public SolrConnectionModel GetSolrConnection(Guid id)
         {
-            return Configurations[projectName];
+            return SolrConnections[id];
         }
 
-        public void CreateConfiguration(string projectName)
+        public List<SolrConnectionModel> GetSolrConnections()
         {
-            var config = new ConfigurationModel
+            return SolrConnections.Values.ToList();
+        }
+
+        public SolrConnectionModel CreateSolrConnection(Guid id, string url, string core)
+        {
+            var config = new SolrConnectionModel
             {
-                ProjectName = projectName
+                Id = id,
+                Url = url,
+                Core = core
             };
 
             var content = JsonConvert.SerializeObject(config);
-            FileService.WriteFile($"App_Data/configurations/{projectName}.json", content);
+            FileService.WriteFile($"App_Data/configurations/solr/{id}.json", content);
+
+            return config;
+        }
+
+        public SiteModel GetSite(Guid id)
+        {
+            return Sites[id];
+        }
+
+        public List<SiteModel> GetSites()
+        {
+            return Sites.Values.ToList();
+        }
+
+        public SiteModel CreateSite(Guid id, string url)
+        {
+            var config = new SiteModel
+            {
+                Id = id,
+                Url = url
+            };
+
+            var content = JsonConvert.SerializeObject(config);
+            FileService.WriteFile($"App_Data/configurations/sites/{id}.json", content);
+
+            return config;
+        }
+
+        public CrawlerModel GetCrawler(Guid id)
+        {
+            return Crawlers[id];
+        }
+
+        public List<CrawlerModel> GetCrawlers()
+        {
+            return Crawlers.Values.ToList();
+        }
+
+        public CrawlerModel CreateCrawler(Guid id, string crawlerName, Guid solrConnectionId, List<Guid> siteIds)
+        {
+            var config = new CrawlerModel
+            {
+                Id = id,
+                CrawlerName = crawlerName,
+                SolrConnection = solrConnectionId,
+                Sites = siteIds
+            };
+
+            var content = JsonConvert.SerializeObject(config);
+            FileService.WriteFile($"App_Data/configurations/crawlers/{id}.json", content);
+
+            return config;
         }
     }
 }

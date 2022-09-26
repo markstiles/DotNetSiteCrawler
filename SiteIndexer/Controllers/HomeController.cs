@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SiteIndexer.Models.ViewModels;
+using SiteIndexer.Services.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -8,20 +10,24 @@ namespace SiteIndexer.Controllers
 {
     public class HomeController : Controller
     {
+        protected readonly IConfigurationService ConfigurationService;
+
+        public HomeController(IConfigurationService configurationService)
+        {
+            ConfigurationService = configurationService;
+        }
+
         public ActionResult Index()
         {
             ViewBag.Title = "Home Page";
 
-            return View();
+            var model = new HomeViewModel
+            {
+                Crawlers = ConfigurationService.GetCrawlers(),
+                SolrConnections = ConfigurationService.GetSolrConnections()
+            };
+
+            return View(model);
         }
-
-        //add configuration setup here
-        //manage cores
-        //site groupings
-        //connection settings
-        //which url extensions are skipped or allowed
-
-        //then configure a single crawl
-        //have a way of using two indexes to prevent and index from going down while crawling
     }
 }

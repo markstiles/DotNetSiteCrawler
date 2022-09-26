@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Web;
 using System.Web.Mvc;
 
-namespace SiteIndexer.Form.Validators
+namespace SiteIndexer.Models.FormModels.Validators
 {
     public class ValidInt : ValidationAttribute
     {

@@ -32,8 +32,6 @@ namespace SiteIndexer.Services.Solr
             Settings = settings;
             LogService = logService;
             Client = clientFactory.CreateClient();
-            //TODO move this to the config
-            Client.BaseAddress = new Uri("http://localhost:900");
             SerialSettings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore,

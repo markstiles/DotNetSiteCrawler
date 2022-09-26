@@ -2,54 +2,190 @@
 
 jQuery(document).ready(function ()
 {
-    //form
-    var configForm = ".configurations .form";
-    var configFormSubmit = configForm + " .config-submit";
+    //global
     var progressIndicator = ".progress-indicator";
-    var submitSuccess = ".submit-success";
-    var submitFailure = ".submit-failure";
+    
+    //solr
+    var solrConfig = ".solr-config";
+    var solrConfigForm = solrConfig + " .form";
+    var solrTestFormSubmit = solrConfigForm + " .solr-test";
+    var solrTestSuccess = solrConfig + " .test-success";
+    var solrTestFailure = solrConfig + " .test-failure";
+    var solrConfigFormSubmit = solrConfigForm + " .solr-submit";
+    var solrSubmitSuccess = solrConfig + " .submit-success";
+    var solrSubmitFailure = solrConfig + " .submit-failure";
 
-    jQuery(configFormSubmit).click(function (e)
-    {
+    //site
+    var siteConfig = ".site-config";
+    var siteConfigForm = siteConfig + " .form";
+    var siteConfigFormSubmit = siteConfigForm + " .site-submit";
+    var siteSubmitSuccess = siteConfig + " .submit-success";
+    var siteSubmitFailure = siteConfig + " .submit-failure";
+
+    //crawler
+    var crawlerConfig = ".crawler-config";
+    var crawlerConfigForm = crawlerConfig + " .form";
+    var crawlerConfigFormSubmit = crawlerConfigForm + " .crawler-submit";
+    var crawlerSubmitSuccess = crawlerConfig + " .submit-success";
+    var crawlerSubmitFailure = crawlerConfig + " .submit-failure";
+
+    jQuery(solrTestFormSubmit).click(function (e) {
         e.preventDefault();
 
-        CreateConfig();
+        TestSolr();
     });
 
-    function CreateConfig()
+    function TestSolr()
     {
-        var projectNameValue = jQuery(configForm + " .project-name").val();
-        var jiraUrlValue = jQuery(configForm + " .jira-url").val();
-        var jiraProjectCodeValue = jQuery(configForm + " .jira-project-code").val();
-        var mavenlinkWorkspaceIdValue = jQuery(configForm + " .mavenlink-workspace-id").val();
+        var solrUrlValue = jQuery(solrConfigForm + " .solr-url").val();
+        var solrCoreValue = jQuery(solrConfigForm + " .solr-core").val();
 
         jQuery(progressIndicator).show();
-        jQuery(submitSuccess).hide();
-        jQuery(submitFailure).hide();
-
+        ResetForms();
+        
         jQuery.post(
-            jQuery(configForm).attr("action"),
+            jQuery(solrConfigForm).attr("test"),
             {
-                ProjectName: projectNameValue,
-                JiraUrl: jiraUrlValue,
-                JiraProjectCode: jiraProjectCodeValue,
-                MavenlinkWorkspaceId: mavenlinkWorkspaceIdValue
+                SolrUrl: solrUrlValue,
+                SolrCore: solrCoreValue
             }
         ).done(function (r)
         {
-            jQuery(configForm + " .project-name").val("");
-            jQuery(configForm + " .jira-project-code").val("");
-            jQuery(configForm + " .mavenlink-workspace-id").val("");
+            jQuery(progressIndicator).hide();
+
+            if (r.Succeeded)
+            {
+                jQuery(solrTestSuccess).show();
+            }
+            else {
+                jQuery(solrTestFailure).show();
+            }
+        });
+    }
+
+    jQuery(solrConfigFormSubmit).click(function (e)
+    {
+        e.preventDefault();
+
+        CreateSolrConfig();
+    });
+
+    function CreateSolrConfig()
+    {
+        var solrUrlValue = jQuery(solrConfigForm + " .solr-url").val();
+        var solrCoreValue = jQuery(solrConfigForm + " .solr-core").val();
+
+        jQuery(progressIndicator).show();
+        ResetForms();
+
+        jQuery.post(
+            jQuery(solrConfigForm).attr("action"),
+            {
+                SolrUrl: solrUrlValue,
+                SolrCore: solrCoreValue
+            }
+        ).done(function (r)
+        {
             jQuery(progressIndicator).hide();
            
             if (r.Succeeded)
             {
-                jQuery(submitSuccess).show();
+                jQuery(solrConfigForm + " .solr-url").val("");
+                jQuery(solrConfigForm + " .solr-core").val("");
+                jQuery(solrSubmitSuccess).show();
             }
             else
             {
-                jQuery(submitFailure).show();
+                jQuery(solrSubmitFailure).show();
             }
         });
+    }
+
+    jQuery(siteConfigFormSubmit).click(function (e) {
+        e.preventDefault();
+
+        CreateSiteConfig();
+    });
+
+    function CreateSiteConfig()
+    {
+        var siteUrlValue = jQuery(siteConfigForm + " .site-url").val();
+
+        jQuery(progressIndicator).show();
+        ResetForms();
+
+        jQuery.post(
+            jQuery(siteConfigForm).attr("action"),
+            {
+                SiteUrl: siteUrlValue
+            }
+        ).done(function (r) {
+            jQuery(progressIndicator).hide();
+
+            if (r.Succeeded)
+            {
+                jQuery(siteConfigForm + " .site-url").val("");
+                jQuery(siteSubmitSuccess).show();
+            }
+            else {
+                jQuery(siteSubmitFailure).show();
+            }
+        });
+    }
+
+    jQuery(crawlerConfigFormSubmit).click(function (e)
+    {
+        e.preventDefault();
+
+        CreateCrawlerConfig();
+    });
+
+    function CreateCrawlerConfig() {
+        var crawlerNameValue = jQuery(crawlerConfigForm + " .crawler-name").val();
+        var solrConnectionValue = jQuery(crawlerConfigForm + " .solr-connection").val();
+        var siteListValue = [];
+        jQuery(crawlerConfigForm + " .sites input[type=checkbox]").each(function ()
+        {
+            if (jQuery(this).is(":checked"))
+                siteListValue.push(jQuery(this).val());
+        });
+        
+        jQuery(progressIndicator).show();
+        ResetForms();
+        jQuery.post(
+            jQuery(crawlerConfigForm).attr("action"),
+            {
+                CrawlerName: crawlerNameValue,
+                SolrConnection: solrConnectionValue,
+                SiteList: siteListValue
+            }
+        ).done(function (r)
+        {
+            jQuery(progressIndicator).hide();
+
+            if (r.Succeeded)
+            {
+                jQuery(crawlerConfigForm + " .site-url").val("");
+                jQuery(crawlerSubmitSuccess).show();
+            }
+            else {
+                jQuery(crawlerSubmitFailure).show();
+            }
+        });
+    }
+
+    function ResetForms()
+    {
+        jQuery(solrTestSuccess).hide();
+        jQuery(solrTestFailure).hide();
+
+        jQuery(solrSubmitSuccess).hide();
+        jQuery(solrSubmitFailure).hide();
+
+        jQuery(siteSubmitSuccess).hide();
+        jQuery(siteSubmitFailure).hide();
+
+        jQuery(crawlerSubmitSuccess).hide();
+        jQuery(crawlerSubmitFailure).hide();
     }
 });

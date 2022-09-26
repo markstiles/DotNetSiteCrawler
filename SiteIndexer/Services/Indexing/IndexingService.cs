@@ -12,7 +12,7 @@ namespace SiteIndexer.Services.Indexing
 {
     public interface IIndexingService
     {
-        SolrUpdateResponseApiModel IndexItem(HtmlDocument html, Uri currentUri, string updatedDate);
+        SolrUpdateResponseApiModel IndexItem(string solrUrl, string solrCore, HtmlDocument html, Uri currentUri, string updatedDate);
     }
 
     public class IndexingService : IIndexingService
@@ -28,7 +28,7 @@ namespace SiteIndexer.Services.Indexing
             StringService = stringService;
         }
 
-        public SolrUpdateResponseApiModel IndexItem(HtmlDocument html, Uri currentUri, string updatedDate)
+        public SolrUpdateResponseApiModel IndexItem(string solrUrl, string solrCore, HtmlDocument html, Uri currentUri, string updatedDate)
         {
             var body = html.DocumentNode.SelectSingleNode("//body");
             var bodyText = "";
@@ -53,7 +53,7 @@ namespace SiteIndexer.Services.Indexing
 
                 bodyText = string.Join(" ", sb.ToString().Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries));
 
-                //TODO strip stop words
+                //TODO add site crawler profile to handle getting content differently for each site
             }
 
             var metatags = html.DocumentNode.SelectNodes("//meta");
@@ -70,7 +70,7 @@ namespace SiteIndexer.Services.Indexing
                 updated = updatedDate
             };
 
-            return SolrApiService.AddDocuments(new List<SolrDocumentApiModel> { model });
+            return SolrApiService.AddDocuments(solrUrl, solrCore, new List<SolrDocumentApiModel> { model });
         }
     }
 }

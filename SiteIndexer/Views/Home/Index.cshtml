@@ -7,8 +7,16 @@
 </div>
 
 <div class="indexing">
+    <h2>Indexing</h2>
     <form class="form" method="post" action="/Indexing/Start" status="/Indexing/GetJobStatus" empty="/Indexing/EmptyIndex">
         <fieldset>
+            <label for="crawler">Solr Connection</label>
+            <select id="crawler" class="crawler">
+                @foreach (var crawler in Model.Crawlers)
+                {
+                    <option value="@crawler.Id">@crawler.CrawlerName</option>
+                }
+            </select>
             <button class="submit scButton">Start Indexing</button>
             <button class="empty-submit scButton">Empty Indexing</button>
         </fieldset>
@@ -18,12 +26,26 @@
         <div class="empty-success"></div>
         <div class="empty-failure"></div>
     </div>
+    <h2>Search</h2>
     <form class="search-form" method="post" action="/Indexing/Search">
         <fieldset>
-            <input type="text" id="query" class="query" />
+            <div class="form-row">
+                <label for="solr-connection">Solr Connection</label>
+                <select id="solr-connection" class="solr-connection">
+                    @foreach (var sc in Model.SolrConnections)
+                    {
+                        <option value="@sc.Id">@sc.Url</option>
+                    }
+                </select>
+            </div>
+            <div class="form-row">
+                <label for="query">Search Query</label>
+                <input type="text" id="query" class="query" />
+            </div>
             <button class="submit scButton">Search Index</button>
         </fieldset>
     </form>
+    <div class="search-failure">The search failed to produce results.</div>
     <div class="search-results"></div>
     @Html.Partial("/Views/Shared/_ProgressIndicator.cshtml")
 </div>

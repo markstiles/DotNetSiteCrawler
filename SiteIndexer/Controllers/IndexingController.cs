@@ -1,5 +1,5 @@
 ﻿using SiteIndexer.Factories;
-using SiteIndexer.Form.Attributes;
+using SiteIndexer.Models.FormModels.Attributes;
 using SiteIndexer.Models.FormModels;
 using SiteIndexer.Models.ViewModels;
 using SiteIndexer.Services;
@@ -61,10 +61,10 @@ namespace SiteIndexer.Controllers
 
         [HttpPost]
         [ValidateForm]
-        public ActionResult Start()
+        public ActionResult Start(Guid CrawlerId)
         {
             //TODO break this into a thread so you can respond to the UI and then get status updates
-            var handleName = JobService.StartJob(ProcessConfiguration);
+            var handleName = JobService.StartJob(CrawlerId, ProcessConfiguration);
             
             var result = new TransactionResult<object>
             {
@@ -85,9 +85,10 @@ namespace SiteIndexer.Controllers
         }
 
         [HttpPost]
-        public ActionResult EmptyIndex()
+        public ActionResult EmptyIndex(Guid solrConnectionId)
         {
-            var response = SolrApiService.DeleteAllDocuments();
+            var config = ConfigurationService.GetSolrConnection(solrConnectionId);
+            var response = SolrApiService.DeleteAllDocuments(config.Url, config.Core);
 
             var result = new TransactionResult<SolrUpdateResponseApiModel>
             {
@@ -100,9 +101,10 @@ namespace SiteIndexer.Controllers
         }
 
         [HttpPost]
-        public ActionResult Search(string query)
+        public ActionResult Search(Guid solrConnectionId, string query)
         {
-            var response = SolrApiService.SearchDocuments<DocApiModel>($"title:{query} or content:{query}");
+            var config = ConfigurationService.GetSolrConnection(solrConnectionId);
+            var response = SolrApiService.SearchDocuments<DocApiModel>(config.Url, config.Core, $"title:{query} or content:{query}");
 
             var result = new TransactionResult<DocApiModel[]>
             {
@@ -116,14 +118,16 @@ namespace SiteIndexer.Controllers
 
         #endregion
 
-        public void ProcessConfiguration(MessageList messages)
+        public void ProcessConfiguration(Guid crawlerId, MessageList messages)
         {
-            //TODO make the start domain come from configuration list
-            var domainList = new List<string>
-            {
-                "https://markstiles.net",
-                "http://projectinsights.local"
-            };
+            var config = ConfigurationService.GetCrawler(crawlerId);
+            var domainList = config.Sites.Select(a => ConfigurationService.GetSite(a).Url).ToList();
+            var solrConfig = ConfigurationService.GetSolrConnection(config.SolrConnection);
+            //new List<string>
+            //{
+            //    "https://markstiles.net",
+            //    "http://projectinsights.local"
+            //};
             var updatedDate = DateTime.Now.ToString("yyy-MM-ddThh:mm:ssZ");
 
             var isIndexed = new Dictionary<string, Uri>();
@@ -161,14 +165,14 @@ namespace SiteIndexer.Controllers
 
                     //TODO batch update items so there aren't so many calls
                     //index item
-                    IndexingService.IndexItem(html, currentUri, updatedDate);
+                    IndexingService.IndexItem(solrConfig.Url, solrConfig.Core, html, currentUri, updatedDate);
 
                     messages.Add($"Crawled: {isIndexed.Count} - Found: {toIndex.Count}");
                 }
             }
 
             //remove anything from solr that wasn't updated
-            SolrApiService.DeleteDocumentsByQuery($"-updated:{updatedDate}");
+            SolrApiService.DeleteDocumentsByQuery(solrConfig.Url, solrConfig.Core, $"-updated:{updatedDate}");
         }
     }
 }

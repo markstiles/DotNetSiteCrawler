@@ -5,8 +5,10 @@ using System.Web;
 
 namespace SiteIndexer.Services.Configuration.Models
 {
-    public class ConfigurationModel
+    public class SolrConnectionModel
     {
-        public string ProjectName { get; set; }
+        public Guid Id { get; set; }
+        public string Url { get; set; }
+        public string Core { get; set; }
     }
 }
