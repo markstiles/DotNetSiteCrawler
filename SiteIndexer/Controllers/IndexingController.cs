@@ -105,6 +105,8 @@ namespace SiteIndexer.Controllers
         {
             var config = ConfigurationService.GetSolrConnection(solrConnectionId);
             var response = SolrApiService.SearchDocuments<DocApiModel>(config.Url, config.Core, $"title:{query} or content:{query}");
+            var searchQuery = string.IsNullOrWhiteSpace(query) ? "*:*" : query;
+            var response = SolrApiService.SearchDocuments<DocApiModel>($"title:{searchQuery} or content:{searchQuery}");
 
             var result = new TransactionResult<DocApiModel[]>
             {
