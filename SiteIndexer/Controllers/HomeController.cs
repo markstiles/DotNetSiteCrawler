@@ -23,8 +23,7 @@ namespace SiteIndexer.Controllers
 
             var model = new HomeViewModel
             {
-                Crawlers = ConfigurationService.GetCrawlers(),
-                SolrConnections = ConfigurationService.GetSolrConnections()
+                Crawlers = ConfigurationService.GetCrawlers()
             };
 
             return View(model);

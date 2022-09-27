@@ -194,6 +194,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\IndexingController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ConfigurationController.cs" />
@@ -215,6 +216,7 @@
     <Compile Include="ISettings.cs" />
     <Compile Include="Models\FormModels\SolrConfigFormModel.cs" />
     <Compile Include="Models\TransactionResult.cs" />
+    <Compile Include="Models\ViewModels\SearchViewModel.cs" />
     <Compile Include="Models\ViewModels\HomeViewModel.cs" />
     <Compile Include="Models\ViewModels\ConfigurationViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -249,6 +251,7 @@
   <ItemGroup>
     <Content Include="assets\js\global.js" />
     <Content Include="assets\js\config.js" />
+    <Content Include="assets\js\search.js" />
     <Content Include="assets\js\home.js" />
     <Content Include="Global.asax" />
     <Content Include="assets\css\site.css" />
@@ -269,6 +272,7 @@
     <None Include="packages.config" />
     <Content Include="Views\Shared\_ProgressIndicator.cshtml" />
     <Content Include="Views\Configuration\Index.cshtml" />
+    <Content Include="Views\Search\Index.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

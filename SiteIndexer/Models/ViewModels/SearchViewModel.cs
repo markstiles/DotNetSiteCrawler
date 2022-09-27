@@ -6,8 +6,8 @@ using System.Web;
 
 namespace SiteIndexer.Models.ViewModels
 {
-    public class HomeViewModel
+    public class SearchViewModel
     {
-        public List<CrawlerModel> Crawlers { get; set; }
+        public List<SolrConnectionModel> SolrConnections { get; set; } 
     }
 }

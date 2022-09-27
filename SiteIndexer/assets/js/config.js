@@ -142,11 +142,11 @@ jQuery(document).ready(function ()
     {
         var crawlerNameValue = jQuery(crawlerConfigForm + " .crawler-name").val();
         var solrConnectionValue = jQuery(crawlerConfigForm + " .solr-connection").val();
-        var siteListValue = [];
+        var sitesValue = [];
         jQuery(crawlerConfigForm + " .sites input[type=checkbox]").each(function ()
         {
             if (jQuery(this).is(":checked"))
-                siteListValue.push(jQuery(this).val());
+                sitesValue.push(jQuery(this).val());
         });
         
         jQuery(progressIndicator).show();
@@ -156,7 +156,7 @@ jQuery(document).ready(function ()
             {
                 CrawlerName: crawlerNameValue,
                 SolrConnection: solrConnectionValue,
-                SiteList: siteListValue
+                Sites: sitesValue
             }
         ).done(function (r)
         {

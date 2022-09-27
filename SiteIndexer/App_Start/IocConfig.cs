@@ -26,6 +26,7 @@ namespace SiteIndexer
             services.AddTransient<HomeController>();
             services.AddTransient<ConfigurationController>();
             services.AddTransient<IndexingController>();
+            services.AddTransient<SearchController>();
 
             //services
             services.AddTransient<ILogService, LogService>();
