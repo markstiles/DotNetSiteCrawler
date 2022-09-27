@@ -6,10 +6,12 @@ h2 { font-size: 14px; margin: 5px 0 0 0; background: #ccc; padding: 4px 8px; bor
 .navbar li { display:inline-block; }
 .navbar a { text-decoration:none; padding:4px 10px; background-color: #ccc; color:#000; }
 .navbar a:hover { background-color: #888; color:#fff; }
+.site-section { border: 1px solid #ccc; padding: 4px 2px 4px 3px; margin: 0 0 10px 0; }
 form { }
 form fieldset { border:none; padding: 0px; margin: 20px 0; }
 .form-row { margin: 0 0 5px; }
 .form-group { margin: 0 0 5px; }
+.button-row { margin:20px 0 0; }
 button {  }
 button:hover {  }
 .content { min-height:500px; }
@@ -27,14 +29,15 @@ button:hover {  }
 .project-links a { text-decoration: none; border: 1px solid #444; padding: 4px 8px; border-radius: 5px; background-color: #eee; font-size: 13px; display: inline-block; margin: 0 10px 0 0; color: #000; cursor: pointer; }
 .project-links a:hover { background-color:#ddd; border-color:#888; }
 /* PROGRESS INDICATOR */
-.progress-indicator { display: none; width: 100%; margin: 0px auto; position: absolute; background-color: #fbfbfb; top: 99px; left: 0px; right: 0px; text-align: center; padding: 100px 0 0 0; }
-.progress-indicator img { width:50px; }
+.progress-indicator { display:none; position: fixed; top: 0px; left: 0px; right: 0px; bottom:0px; text-align: center; }
+.progress-indicator img { width: 150px; position: absolute; top: 50%; border: 1px solid #ccc; left: 45%; border-radius: 39px; }
+.progress-indicator .pi-bg { opacity: 0.7; background-color: #fbfbfb; height:100%; width:100%; }
 /* CONFIGURATION */
 .configurations label { width: 125px; display:inline-block; }
 .configurations input { width: 200px; display:inline-block; }
-.sites { margin: 10px 0 20px 125px; }
+.sites { margin: 10px 0 0px 125px; }
 .sites label { display:inline-block; font-size:12px; }
-.sites input[type=checkbox] { display:inline-block; width:auto; margin-right: 5px; }
+.sites input[type=checkbox] { display:inline-block; width:auto; margin-right: 5px; vertical-align:top; }
 /* SCROLLABLE */
 .scrollable { max-height: 200px; overflow-y: scroll; }
 /* TOOLTIP */

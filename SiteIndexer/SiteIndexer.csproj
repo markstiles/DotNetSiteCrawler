@@ -247,6 +247,7 @@
     <Compile Include="Settings.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="assets\js\global.js" />
     <Content Include="assets\js\config.js" />
     <Content Include="assets\js\home.js" />
     <Content Include="Global.asax" />

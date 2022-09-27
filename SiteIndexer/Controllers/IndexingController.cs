@@ -104,12 +104,12 @@ namespace SiteIndexer.Controllers
         {
             var config = ConfigurationService.GetSolrConnection(solrConnectionId);
             var searchQuery = string.IsNullOrWhiteSpace(query) ? "*:*" : query;
-            var response = SolrApiService.SearchDocuments<DocApiModel>(config.Url, config.Core, $"title:{searchQuery} or content:{searchQuery}");
+            var response = SolrApiService.SearchDocuments<DocApiModel>(config.Url, config.Core, searchQuery);
 
             var result = new TransactionResult<DocApiModel[]>
             {
                 Succeeded = true,
-                ReturnValue = response.response.docs,
+                ReturnValue = response?.response?.docs ?? new DocApiModel[0],
                 ErrorMessage = string.Empty
             };
 

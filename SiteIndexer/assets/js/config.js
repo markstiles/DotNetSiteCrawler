@@ -2,9 +2,6 @@
 
 jQuery(document).ready(function ()
 {
-    //global
-    var progressIndicator = ".progress-indicator";
-    
     //solr
     var solrConfig = ".solr-config";
     var solrConfigForm = solrConfig + " .form";
@@ -119,7 +116,8 @@ jQuery(document).ready(function ()
             {
                 SiteUrl: siteUrlValue
             }
-        ).done(function (r) {
+        ).done(function (r)
+        {
             jQuery(progressIndicator).hide();
 
             if (r.Succeeded)
@@ -140,7 +138,8 @@ jQuery(document).ready(function ()
         CreateCrawlerConfig();
     });
 
-    function CreateCrawlerConfig() {
+    function CreateCrawlerConfig()
+    {
         var crawlerNameValue = jQuery(crawlerConfigForm + " .crawler-name").val();
         var solrConnectionValue = jQuery(crawlerConfigForm + " .solr-connection").val();
         var siteListValue = [];

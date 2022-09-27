@@ -5,7 +5,6 @@ jQuery(document).ready(function ()
     //form
     var indexingForm = ".indexing .form";
     var indexingFormSubmit = indexingForm + " .submit";
-    var indexingProgressIndicator = ".indexing .progress-indicator";
     var jobMessages = ".job-messages";
 
     //empty index
@@ -30,7 +29,7 @@ jQuery(document).ready(function ()
     {
         var crawlerIdValue = jQuery(indexingForm + " .crawler").val();
         jQuery(jobMessages).html("");
-        jQuery(indexingProgressIndicator).show();
+        jQuery(progressIndicator).show();
                 
         jQuery.post(jQuery(indexingForm).attr("action"),
         {
@@ -38,7 +37,8 @@ jQuery(document).ready(function ()
         }
         ).done(function (jobResult)
         {
-            jQuery(indexingProgressIndicator).hide();
+            jQuery(progressIndicator).hide();
+       
             var lastDate = new Date()
             lastDate.setDate(lastDate.getDate() - 1)
 
@@ -67,15 +67,16 @@ jQuery(document).ready(function ()
         EmptyIndex();
     });
 
-    function EmptyIndex() {
-        jQuery(indexingProgressIndicator).show();
+    function EmptyIndex()
+    {
+        jQuery(progressIndicator).show();
         jQuery(emptyFormSuccess).hide();
         jQuery(emptyFormFailure).hide();
 
         jQuery.post(jQuery(indexingForm).attr("empty"), {})
         .done(function (r)
         {
-            jQuery(indexingProgressIndicator).hide();
+            jQuery(progressIndicator).hide();
             if (r.Succeeded)
             {
                 jQuery(emptyFormSuccess).show();
@@ -97,7 +98,8 @@ jQuery(document).ready(function ()
     {
         var solrConnectionIdValue = jQuery(searchForm + " .solr-connection").val();
         var queryValue = jQuery(searchForm + " .query").val();
-        jQuery(indexingProgressIndicator).show();
+
+        jQuery(progressIndicator).show();
         jQuery(searchResults).html("");
 
         jQuery.post(jQuery(searchForm).attr("action"),
@@ -107,7 +109,7 @@ jQuery(document).ready(function ()
             })
             .done(function (r)
             {
-                jQuery(indexingProgressIndicator).hide();
+                jQuery(progressIndicator).hide();
                 if (r.Succeeded)
                 {
                     for (let i = 0; i < r.ReturnValue.length; i++)
@@ -152,8 +154,4 @@ function CheckStatus(jobResult, statusUrl, lastDate, statusFunction, finishFunct
             }   
         });
     }, 1000);
-}
-
-function parseJsonDate(jsonDateString) {
-    return new Date(parseInt(jsonDateString.replace('/Date(', '')));
 }

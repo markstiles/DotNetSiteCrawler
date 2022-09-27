@@ -7,6 +7,7 @@
     <link href="/assets/css/site.css?x=@(new System.Random().Next())" rel="stylesheet" type="text/css" />
 </head>
 <body>
+    <h1>Site Indexer</h1>
     <header>
         <div class="navbar">
             <ul>
@@ -17,11 +18,13 @@
     </header>
     <div class="content">
         @RenderBody()
+        @Html.Partial("/Views/Shared/_ProgressIndicator.cshtml")
     </div>
     <footer>
         <p>&copy; @DateTime.Now.Year</p>
     </footer>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="~/assets/js/global.js"></script>
     <script src="~/assets/js/home.js"></script>
     <script src="~/assets/js/config.js"></script>
 </body>

@@ -1,10 +1,11 @@
-﻿@{
+﻿@model SiteIndexer.Models.ViewModels.ConfigurationViewModel
+@{
     ViewBag.Title = "Configuration Page";
 }
 
-<div class="configurations">
-    <div class="solr-config">
-        <h2>Create a Solr Connection</h2>
+<div class="content-container configurations">
+    <h2>Create a Solr Connection</h2>
+    <div class="site-section solr-config">
         <form class="form" method="post" action="/Configuration/CreateSolrConfiguration" test="/Configuration/TestSolrConfiguration">
             <fieldset>
                 <div class="form-row">
@@ -15,8 +16,10 @@
                     <label for="solr-core">Solr Core</label>
                     <input type="text" id="solr-core" class="solr-core" />
                 </div>
-                <button class="solr-test scButton">Test Connection</button>
-                <button class="solr-submit scButton">Save Connection</button>
+                <div class="form-row button-row">
+                    <button class="solr-test scButton">Test Connection</button>
+                    <button class="solr-submit scButton">Save Connection</button>
+                </div>
             </fieldset>
         </form>
         <div class="test-success">
@@ -32,15 +35,17 @@
             The Solr connection failed to save.
         </div>
     </div>
-    <div class="site-config">
-        <h2>Add Sites</h2>
+    <h2>Add Sites</h2>
+    <div class="site-section site-config">
         <form class="form" method="post" action="/Configuration/CreateSiteConfiguration">
             <fieldset>
                 <div class="form-row">
                     <label for="site-url">Site Url</label>
                     <input type="text" id="site-url" class="site-url" />
                 </div>
-                <button class="site-submit scButton">Save Site</button>
+                <div class="form-row button-row">
+                    <button class="site-submit scButton">Save Site</button>
+                </div>
             </fieldset>
         </form>
         <div class="submit-success">
@@ -50,8 +55,8 @@
             The Site failed to save.
         </div>
     </div>
-    <div class="crawler-config">
-        <h2>Create an Crawler</h2>
+    <h2>Create a Crawler</h2>
+    <div class="site-section crawler-config">
         <form class="form" method="post" action="/Configuration/CreateCrawlingConfiguration">
             <fieldset>
                 <div class="form-row">
@@ -61,7 +66,7 @@
                 <div class="form-row">
                     <label for="solr-connection">Solr Connection</label>
                     <select id="solr-connection" class="solr-connection">
-                        @foreach(var sc in Model.SolrConnections)
+                        @foreach (var sc in Model.SolrConnections)
                         {
                             <option value="@sc.Id">@sc.Url</option>
                         }
@@ -80,7 +85,9 @@
                         }
                     </div>
                 </div>
-                <button class="crawler-submit scButton">Save Crawler</button>
+                <div class="form-row button-row">
+                    <button class="crawler-submit scButton">Save Crawler</button>
+                </div>
             </fieldset>
         </form>
         <div class="submit-success">
@@ -90,5 +97,4 @@
             The crawler failed to save.
         </div>
     </div>
-    @Html.Partial("/Views/Shared/_ProgressIndicator.cshtml")
 </div>
