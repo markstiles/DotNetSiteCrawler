@@ -1,30 +1,18 @@
 ﻿using SiteIndexer.Factories;
+using SiteIndexer.Models;
 using SiteIndexer.Models.FormModels.Attributes;
-using SiteIndexer.Models.FormModels;
-using SiteIndexer.Models.ViewModels;
-using SiteIndexer.Services;
-using Newtonsoft.Json;
+using SiteIndexer.Services.Configuration;
+using SiteIndexer.Services.Crawling;
+using SiteIndexer.Services.Indexing;
+using SiteIndexer.Services.Jobs;
+using SiteIndexer.Services.Jobs.Models;
+using SiteIndexer.Services.Solr;
+using SiteIndexer.Services.Solr.Models;
+using SiteIndexer.Services.System;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using SiteIndexer.Services.Solr;
-using SiteIndexer.Services.Configuration.Models;
-using SiteIndexer.Services.Configuration;
-using SiteIndexer.Services.Crawling;
-using SiteIndexer.Models;
-using System.Net.Http;
-using System.Threading.Tasks;
-using HtmlAgilityPack;
-using System.Text;
-using System.Net.Http.Headers;
-using SiteIndexer.Services.Solr.Models;
-using SiteIndexer.Services.System;
-using SiteIndexer.Services.Indexing;
-using System.Threading;
-using SiteIndexer.Services.Jobs.Models;
-using SiteIndexer.Services.Jobs;
 
 namespace SiteIndexer.Controllers
 {
@@ -38,6 +26,7 @@ namespace SiteIndexer.Controllers
         protected readonly IStringService StringService;
         protected readonly IIndexingService IndexingService;
         protected readonly IJobService JobService;
+        protected readonly ISiteCrawlerFactory SiteCrawlerFactory;
 
         public IndexingController(
             IConfigurationService configurationService, 
@@ -45,7 +34,8 @@ namespace SiteIndexer.Controllers
             ICrawlingService crawlingService,
             IStringService stringService,
             IIndexingService indexingService,
-            IJobService jobService)
+            IJobService jobService,
+            ISiteCrawlerFactory siteCrawlerFactory)
         {
             ConfigurationService = configurationService;
             SolrApiService = solrApiService;
@@ -53,6 +43,7 @@ namespace SiteIndexer.Controllers
             StringService = stringService;
             IndexingService = indexingService;
             JobService = jobService;
+            SiteCrawlerFactory = siteCrawlerFactory;
         }
 
         #endregion
@@ -84,10 +75,11 @@ namespace SiteIndexer.Controllers
         }
 
         [HttpPost]
-        public ActionResult EmptyIndex(Guid solrConnectionId)
+        public ActionResult EmptyIndex(Guid CrawlerId)
         {
-            var config = ConfigurationService.GetSolrConnection(solrConnectionId);
-            var response = SolrApiService.DeleteAllDocuments(config.Url, config.Core);
+            var crawler = ConfigurationService.GetCrawler(CrawlerId);
+            var solr = ConfigurationService.GetSolrConnection(crawler.SolrConnection);
+            var response = SolrApiService.DeleteAllDocuments(solr.Url, solr.Core);
 
             var result = new TransactionResult<SolrUpdateResponseApiModel>
             {
@@ -104,15 +96,17 @@ namespace SiteIndexer.Controllers
         public void ProcessConfiguration(Guid crawlerId, MessageList messages)
         {
             var config = ConfigurationService.GetCrawler(crawlerId);
-            var domainList = config.Sites.Select(a => ConfigurationService.GetSite(a).Url).ToList();
+            var siteList = config.Sites.Select(a => ConfigurationService.GetSite(a));
             var solrConfig = ConfigurationService.GetSolrConnection(config.SolrConnection);
             var updatedDate = DateTime.Now.ToString("yyy-MM-ddThh:mm:ssZ");
 
             var isIndexed = new Dictionary<string, Uri>();
-            foreach (var domain in domainList)
+            foreach (var site in siteList)
             {
-                messages.Add($"Starting to crawl: {domain}");
-                var startUri = new Uri($"{domain}/");
+                var parser = SiteCrawlerFactory.Create(site.Parser);
+                
+                messages.Add($"Starting to crawl: {site.Url}");
+                var startUri = new Uri($"{site.Url}/");
                 var toIndex = new Dictionary<string, Uri>
                 {
                     { StringService.GetValidKey(startUri), startUri }
@@ -131,7 +125,7 @@ namespace SiteIndexer.Controllers
                     var html = CrawlingService.GetHtml(currentUri);
 
                     //gather all the links and determine what has been crawled or not
-                    var validLinks = CrawlingService.GetValidLinks(html, currentUri);
+                    var validLinks = CrawlingService.GetValidLinks(html, currentUri, parser.GetAllowedPageExtensions());
                     foreach (var uri in validLinks)
                     {
                         var validKey = StringService.GetValidKey(uri);
@@ -143,7 +137,7 @@ namespace SiteIndexer.Controllers
 
                     //TODO batch update items so there aren't so many calls
                     //index item
-                    IndexingService.IndexItem(solrConfig.Url, solrConfig.Core, html, currentUri, updatedDate);
+                    IndexingService.IndexItem(parser, solrConfig.Url, solrConfig.Core, html, currentUri, updatedDate);
 
                     messages.Add($"Found: {(toIndex.Count + isIndexed.Count)} - Crawled: {isIndexed.Count} - Remaining - {toIndex.Count}");
                 }

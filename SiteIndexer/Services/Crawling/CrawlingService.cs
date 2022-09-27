@@ -12,7 +12,7 @@ namespace SiteIndexer.Services.Crawling
 {
     public interface ICrawlingService
     {
-        List<Uri> GetValidLinks(HtmlDocument html, Uri htmlUri);
+        List<Uri> GetValidLinks(HtmlDocument html, Uri htmlUri, List<string> allowedExtensions);
         string GetExtension(Uri uri);
         HtmlDocument GetHtml(Uri uri);
     }
@@ -24,10 +24,9 @@ namespace SiteIndexer.Services.Crawling
         public CrawlingService(IHttpClientFactory clientFactory)
         {
             Client = clientFactory.CreateClient();
-            //Client.BaseAddress = new Uri("http://localhost:900");
         }
 
-        public List<Uri> GetValidLinks(HtmlDocument html, Uri htmlUri)
+        public List<Uri> GetValidLinks(HtmlDocument html, Uri htmlUri, List<string> allowedExtensions)
         {
             var links = new List<Uri>();
 
@@ -50,12 +49,6 @@ namespace SiteIndexer.Services.Crawling
 
                 var separator = href.StartsWith("/") ? "" : "/";
                 var linkUri = new Uri(isAbsoluteUri ? href : $"{htmlUri.Scheme}://{htmlUri.Host}{separator}{href}");
-
-                //TODO add allowed extensions to configuration
-                var allowedExtensions = new List<string>
-                {
-                    "php", "htm", "html", "jsp", "asp", "aspx"
-                };
 
                 var fileExtension = GetExtension(linkUri);
                 var hasExtension = !string.IsNullOrWhiteSpace(fileExtension);

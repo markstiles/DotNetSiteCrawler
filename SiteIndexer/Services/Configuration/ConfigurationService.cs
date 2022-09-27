@@ -17,7 +17,7 @@ namespace SiteIndexer.Services.Configuration
         SolrConnectionModel CreateSolrConnection(Guid id, string url, string core);
         SiteModel GetSite(Guid id);
         List<SiteModel> GetSites();
-        SiteModel CreateSite(Guid id, string url);
+        SiteModel CreateSite(Guid id, string url, string parser);
         CrawlerModel GetCrawler(Guid id);
         List<CrawlerModel> GetCrawlers();
         CrawlerModel CreateCrawler(Guid id, string crawlerName, Guid solrConnectionId, List<Guid> siteIds);
@@ -102,12 +102,13 @@ namespace SiteIndexer.Services.Configuration
             return Sites.Values.ToList();
         }
 
-        public SiteModel CreateSite(Guid id, string url)
+        public SiteModel CreateSite(Guid id, string url, string parser)
         {
             var config = new SiteModel
             {
                 Id = id,
-                Url = url
+                Url = url,
+                Parser = parser
             };
 
             var content = JsonConvert.SerializeObject(config);

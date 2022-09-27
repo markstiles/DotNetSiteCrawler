@@ -198,7 +198,7 @@
     <Compile Include="Controllers\IndexingController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ConfigurationController.cs" />
-    <Compile Include="Factories\IssueViewModelFactory.cs" />
+    <Compile Include="Factories\SiteCrawlerFactory.cs" />
     <Compile Include="Models\FormModels\Attributes\TransactionError.cs" />
     <Compile Include="Models\FormModels\Attributes\ValidateForm.cs" />
     <Compile Include="Models\FormModels\CrawlConfigFormModel.cs" />
@@ -222,6 +222,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\Configuration\Models\CrawlerModel.cs" />
     <Compile Include="Services\Configuration\Models\SiteModel.cs" />
+    <Compile Include="Services\Indexing\SiteParsers\DefaultSiteParser.cs" />
+    <Compile Include="Services\Indexing\SiteParsers\ISiteParser.cs" />
     <Compile Include="Services\Indexing\IndexingService.cs" />
     <Compile Include="Services\Jobs\JobService.cs" />
     <Compile Include="Services\Jobs\Models\JobStatus.cs" />
@@ -252,7 +254,7 @@
     <Content Include="assets\js\global.js" />
     <Content Include="assets\js\config.js" />
     <Content Include="assets\js\search.js" />
-    <Content Include="assets\js\home.js" />
+    <Content Include="assets\js\indexing.js" />
     <Content Include="Global.asax" />
     <Content Include="assets\css\site.css" />
     <Content Include="Web.config" />

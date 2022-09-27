@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using SiteIndexer.Services.Indexing.SiteParsers;
 using SiteIndexer.Services.Solr;
 using SiteIndexer.Services.Solr.Models;
 using SiteIndexer.Services.System;
@@ -12,7 +13,7 @@ namespace SiteIndexer.Services.Indexing
 {
     public interface IIndexingService
     {
-        SolrUpdateResponseApiModel IndexItem(string solrUrl, string solrCore, HtmlDocument html, Uri currentUri, string updatedDate);
+        SolrUpdateResponseApiModel IndexItem(ISiteParser parser, string solrUrl, string solrCore, HtmlDocument html, Uri currentUri, string updatedDate);
     }
 
     public class IndexingService : IIndexingService
@@ -28,43 +29,16 @@ namespace SiteIndexer.Services.Indexing
             StringService = stringService;
         }
 
-        public SolrUpdateResponseApiModel IndexItem(string solrUrl, string solrCore, HtmlDocument html, Uri currentUri, string updatedDate)
+        public SolrUpdateResponseApiModel IndexItem(ISiteParser parser, string solrUrl, string solrCore, HtmlDocument html, Uri currentUri, string updatedDate)
         {
-            var body = html.DocumentNode.SelectSingleNode("//body");
-            var bodyText = "";
-            if (body != null)
-            {
-                var nodesToRemove = body.SelectNodes("//a").ToList();
-                foreach (var node in nodesToRemove)
-                    node.Remove();
-
-                var bodyInnerText = string.Join(" ", body.InnerText.Split(new string[] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries));
-
-                var charArr = bodyInnerText.ToCharArray();
-                StringBuilder sb = new StringBuilder();
-                foreach (char c in charArr)
-                {
-                    if (!char.IsLetter(c) && !char.IsWhiteSpace(c))
-                        continue;
-
-                    sb.Append(c);
-                }
-
-                bodyText = string.Join(" ", sb.ToString().Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries));
-
-                //TODO add site crawler profile to handle getting content differently for each site
-            }
-
-            var metatags = html.DocumentNode.SelectNodes("//meta");
-            //TODO build title with fallbacks to og title or meta title or h1
-            var title = html.DocumentNode.SelectSingleNode("/html/head/title");
-
-            //TODO build with factory
+            var title = parser.GetTitle(html);
+            var content = parser.GetContent(html);
+            
             var model = new SolrDocumentApiModel
             {
                 id = StringService.GetValidKey(currentUri),
-                title = title?.InnerText ?? "",
-                content = bodyText,
+                title = title,
+                content = content,
                 url = currentUri.AbsoluteUri,
                 updated = updatedDate
             };

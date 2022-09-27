@@ -26,9 +26,11 @@ jQuery(document).ready(function ()
     var crawlerSubmitSuccess = crawlerConfig + " .submit-success";
     var crawlerSubmitFailure = crawlerConfig + " .submit-failure";
 
-    jQuery(solrTestFormSubmit).click(function (e) {
+    jQuery(solrTestFormSubmit).click(function (e)
+    {
         e.preventDefault();
 
+        ResetConfigForms();
         TestSolr();
     });
 
@@ -38,7 +40,6 @@ jQuery(document).ready(function ()
         var solrCoreValue = jQuery(solrConfigForm + " .solr-core").val();
 
         jQuery(progressIndicator).show();
-        ResetForms();
         
         jQuery.post(
             jQuery(solrConfigForm).attr("test"),
@@ -64,6 +65,7 @@ jQuery(document).ready(function ()
     {
         e.preventDefault();
 
+        ResetConfigForms();
         CreateSolrConfig();
     });
 
@@ -73,8 +75,7 @@ jQuery(document).ready(function ()
         var solrCoreValue = jQuery(solrConfigForm + " .solr-core").val();
 
         jQuery(progressIndicator).show();
-        ResetForms();
-
+        
         jQuery.post(
             jQuery(solrConfigForm).attr("action"),
             {
@@ -98,23 +99,26 @@ jQuery(document).ready(function ()
         });
     }
 
-    jQuery(siteConfigFormSubmit).click(function (e) {
+    jQuery(siteConfigFormSubmit).click(function (e)
+    {
         e.preventDefault();
 
+        ResetConfigForms();
         CreateSiteConfig();
     });
 
     function CreateSiteConfig()
     {
         var siteUrlValue = jQuery(siteConfigForm + " .site-url").val();
+        var parserValue = jQuery(siteConfigForm + " .parser").val();
 
         jQuery(progressIndicator).show();
-        ResetForms();
-
+        
         jQuery.post(
             jQuery(siteConfigForm).attr("action"),
             {
-                SiteUrl: siteUrlValue
+                SiteUrl: siteUrlValue,
+                Parser: parserValue
             }
         ).done(function (r)
         {
@@ -135,6 +139,7 @@ jQuery(document).ready(function ()
     {
         e.preventDefault();
 
+        ResetConfigForms();
         CreateCrawlerConfig();
     });
 
@@ -150,7 +155,7 @@ jQuery(document).ready(function ()
         });
         
         jQuery(progressIndicator).show();
-        ResetForms();
+
         jQuery.post(
             jQuery(crawlerConfigForm).attr("action"),
             {
@@ -173,7 +178,7 @@ jQuery(document).ready(function ()
         });
     }
 
-    function ResetForms()
+    function ResetConfigForms()
     {
         jQuery(solrTestSuccess).hide();
         jQuery(solrTestFailure).hide();

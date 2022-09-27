@@ -87,7 +87,7 @@ namespace SiteIndexer.Controllers
         [ValidateForm]
         public ActionResult CreateSiteConfiguration(SiteConfigFormModel form)
         {
-            var config = ConfigurationService.CreateSite(Guid.NewGuid(), form.SiteUrl);
+            var config = ConfigurationService.CreateSite(Guid.NewGuid(), form.SiteUrl, form.Parser);
 
             var result = new TransactionResult<SiteModel>
             {

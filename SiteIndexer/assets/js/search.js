@@ -12,6 +12,7 @@ jQuery(document).ready(function ()
     {
         e.preventDefault();
 
+        ResetSearchForms();
         SearchIndex();
     });
 
@@ -21,8 +22,7 @@ jQuery(document).ready(function ()
         var queryValue = jQuery(searchForm + " .query").val();
 
         jQuery(progressIndicator).show();
-        jQuery(searchResults).html("");
-
+        
         jQuery.post(jQuery(searchForm).attr("action"),
             {
                 solrConnectionId: solrConnectionIdValue,
@@ -49,5 +49,10 @@ jQuery(document).ready(function ()
                     jQuery(searchFormFailure).show();
                 }
             });
+    }
+
+    function ResetSearchForms()
+    {
+        jQuery(searchResults).html("");
     }
 });

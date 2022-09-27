@@ -41,7 +41,7 @@ namespace SiteIndexer
             services.AddSingleton<IJobService, JobService>();
 
             //factories
-            //services.AddTransient<IIssueViewModelFactory, IssueViewModelFactory>();
+            services.AddTransient<ISiteCrawlerFactory, SiteCrawlerFactory>();
         }
     }
 }

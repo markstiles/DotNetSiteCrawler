@@ -11,5 +11,7 @@ namespace SiteIndexer.Models.FormModels
     {
         [Required(ErrorMessage = SiteConfigMessages.SiteUrlRequired)]
         public string SiteUrl { get; set; }
+        [Required(ErrorMessage = SiteConfigMessages.ParserRequired)]
+        public string Parser { get; set; }
     }
 }

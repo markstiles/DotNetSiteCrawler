@@ -9,26 +9,27 @@ jQuery(document).ready(function ()
 
     //empty index
     var emptyFormSubmit = indexingForm + " .empty-submit";
-    var emptyFormSuccess = indexingForm + " .empty-success";
-    var emptyFormFailure = indexingForm + " .empty-failure";
+    var emptyFormSuccess = ".empty-success";
+    var emptyFormFailure = ".empty-failure";
 
     jQuery(indexingFormSubmit).click(function (e)
     {
         e.preventDefault();
 
+        ResetIndexingForms();
         StartIndexing();
     });
 
     function StartIndexing()
     {
         var crawlerIdValue = jQuery(indexingForm + " .crawler").val();
-        jQuery(jobMessages).html("");
+
         jQuery(progressIndicator).show();
                 
         jQuery.post(jQuery(indexingForm).attr("action"),
-        {
-            CrawlerId: crawlerIdValue
-        }
+            {
+                CrawlerId: crawlerIdValue
+            }
         ).done(function (jobResult)
         {
             jQuery(progressIndicator).hide();
@@ -58,16 +59,21 @@ jQuery(document).ready(function ()
     {
         e.preventDefault();
 
+        ResetIndexingForms();
         EmptyIndex();
     });
 
     function EmptyIndex()
     {
-        jQuery(progressIndicator).show();
-        jQuery(emptyFormSuccess).hide();
-        jQuery(emptyFormFailure).hide();
+        var crawlerIdValue = jQuery(indexingForm + " .crawler").val();
 
-        jQuery.post(jQuery(indexingForm).attr("empty"), {})
+        jQuery(progressIndicator).show();
+        
+        jQuery.post(jQuery(indexingForm).attr("empty"),
+            {
+                CrawlerId: crawlerIdValue
+            }
+        )
         .done(function (r)
         {
             jQuery(progressIndicator).hide();
@@ -79,6 +85,14 @@ jQuery(document).ready(function ()
                 jQuery(emptyFormFailure).show();
             }
         });
+    }
+
+    function ResetIndexingForms()
+    {
+        jQuery(jobMessages).html("");
+
+        jQuery(emptyFormSuccess).hide();
+        jQuery(emptyFormFailure).hide();
     }
 });
 

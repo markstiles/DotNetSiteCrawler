@@ -3,7 +3,7 @@ header { margin: 20px 0px; }
 h2 { font-size: 14px; margin: 5px 0 0 0; background: #ddd; padding: 4px 8px; border-radius: 5px 0 0px 0px; border: 1px solid #236bc5; }
 .navbar { }
 .navbar ul { padding:0px; }
-.navbar li { display:inline-block; margin:0 10px 0 0; }
+.navbar li { display:inline-block; margin:0 5px 0 0; }
 .navbar a { text-decoration: none; padding: 6px 20px; background-color: #236bc5; color: #fff; font-weight: bold; border-radius: 5px 0 5px 0; }
 .navbar a:hover { background-color: #ffc347; color:#fff; }
 .site-section { border: 1px solid #236bc5; padding: 22px 2px 4px 3px; margin: 0 0 10px 0; position: relative; border-radius: 0 0px 5px 0px; border-width: 0px 1px 1px; }
@@ -12,17 +12,21 @@ form fieldset { border:none; padding: 0px; margin: 20px 0; }
 .form-row { margin: 0 0 10px; }
 .form-group { margin: 0 0 5px; }
 .button-row { margin:20px 0 0; padding:0 130px; }
-button { color: #fff; background: #236bc5; border-radius: 3px; border: none; padding: 6px 9px; cursor: pointer; }
+button { color: #fff; background: #236bc5; border-radius: 3px 0 3px 0; border: none; padding: 6px 9px; cursor: pointer; }
 button:hover { background:#ffc347; }
 .content { min-height:500px; }
+.empty-success,
 .test-success,
 .submit-success,
+.empty-failure,
 .test-failure,
 .submit-failure,
 .search-failure { display:none; font-weight: bold; font-size: 12px; padding: 4px 10px; color:#fff; position:absolute; top:0px; right:0px; left:0px; }
 .test-success,
+.empty-success,
 .submit-success { background-color:#3cc771; }
 .test-failure,
+.empty-failure,
 .submit-failure,
 .search-failure { background-color:#ed6561; }
 .project-links { margin-bottom: 15px; }
