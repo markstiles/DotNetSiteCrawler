@@ -99,23 +99,6 @@ namespace SiteIndexer.Controllers
             return Json(result);
         }
 
-        [HttpPost]
-        public ActionResult Search(Guid solrConnectionId, string query)
-        {
-            var config = ConfigurationService.GetSolrConnection(solrConnectionId);
-            var searchQuery = string.IsNullOrWhiteSpace(query) ? "*:*" : query;
-            var response = SolrApiService.SearchDocuments<DocApiModel>(config.Url, config.Core, searchQuery);
-
-            var result = new TransactionResult<DocApiModel[]>
-            {
-                Succeeded = true,
-                ReturnValue = response?.response?.docs ?? new DocApiModel[0],
-                ErrorMessage = string.Empty
-            };
-
-            return Json(result);
-        }
-
         #endregion
 
         public void ProcessConfiguration(Guid crawlerId, MessageList messages)
@@ -162,7 +145,7 @@ namespace SiteIndexer.Controllers
                     //index item
                     IndexingService.IndexItem(solrConfig.Url, solrConfig.Core, html, currentUri, updatedDate);
 
-                    messages.Add($"Crawled: {isIndexed.Count} - Found: {toIndex.Count}");
+                    messages.Add($"Found: {(toIndex.Count + isIndexed.Count)} - Crawled: {isIndexed.Count} - Remaining - {toIndex.Count}");
                 }
             }
 

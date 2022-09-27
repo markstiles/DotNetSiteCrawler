@@ -43,7 +43,7 @@ namespace SiteIndexer.Controllers
         public ActionResult Search(Guid solrConnectionId, string query)
         {
             var config = ConfigurationService.GetSolrConnection(solrConnectionId);
-            var searchQuery = string.IsNullOrWhiteSpace(query) ? "*:*" : query;
+            var searchQuery = string.IsNullOrWhiteSpace(query) ? "*:*" : $"title:{query} or content:{query}";
             var response = SolrApiService.SearchDocuments<DocApiModel>(config.Url, config.Core, searchQuery);
 
             var result = new TransactionResult<DocApiModel[]>
