@@ -46,7 +46,7 @@ button:hover { background:#ffc347; }
 /* SCROLLABLE */
 .scrollable { max-height: 200px; overflow-y: scroll; }
 /* INDEXING */
-.job-messages { height: 200px; border: 1px solid #236bc5; overflow: auto; border-radius: 5px; }
+.job-messages { height: 200px; border: 1px solid #236bc5; overflow: auto; border-radius: 5px; box-shadow:inset 0px 0px 5px 1px #ccc; }
 .message { font-size:14px; padding:3px 10px; }
 .message:nth-child(odd) { background: #eee; }
 /* SEARCH */

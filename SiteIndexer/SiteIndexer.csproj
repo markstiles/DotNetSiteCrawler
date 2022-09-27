@@ -193,12 +193,11 @@
     <Compile Include="App_Start\IocConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
-    <Compile Include="Constants.cs" />
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\IndexingController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ConfigurationController.cs" />
-    <Compile Include="Factories\SiteCrawlerFactory.cs" />
+    <Compile Include="Factories\SiteParserFactory.cs" />
     <Compile Include="Models\FormModels\Attributes\TransactionError.cs" />
     <Compile Include="Models\FormModels\Attributes\ValidateForm.cs" />
     <Compile Include="Models\FormModels\CrawlConfigFormModel.cs" />
@@ -213,7 +212,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="ISettings.cs" />
     <Compile Include="Models\FormModels\SolrConfigFormModel.cs" />
     <Compile Include="Models\TransactionResult.cs" />
     <Compile Include="Models\ViewModels\SearchViewModel.cs" />
@@ -248,7 +246,6 @@
     <Compile Include="Services\Solr\SolrClient.cs" />
     <Compile Include="Services\Solr\Models\SolrQueryResponseApiModel.cs" />
     <Compile Include="Services\Configuration\Models\SolrConnectionModel.cs" />
-    <Compile Include="Settings.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="assets\js\global.js" />

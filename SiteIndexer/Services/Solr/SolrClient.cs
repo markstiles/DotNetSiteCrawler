@@ -21,15 +21,13 @@ namespace SiteIndexer.Services.Solr
     {
         #region Constructor
 
-        protected readonly ISettings Settings;
         protected readonly ILogService LogService;
         protected readonly HttpClient Client;
 
         protected readonly JsonSerializerSettings SerialSettings;
 
-        public SolrClient(ISettings settings, ILogService logService, IHttpClientFactory clientFactory)
+        public SolrClient(ILogService logService, IHttpClientFactory clientFactory)
         {
-            Settings = settings;
             LogService = logService;
             Client = clientFactory.CreateClient();
             SerialSettings = new JsonSerializerSettings

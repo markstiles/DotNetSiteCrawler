@@ -26,7 +26,7 @@ namespace SiteIndexer.Controllers
         protected readonly IStringService StringService;
         protected readonly IIndexingService IndexingService;
         protected readonly IJobService JobService;
-        protected readonly ISiteCrawlerFactory SiteCrawlerFactory;
+        protected readonly ISiteParserFactory SiteCrawlerFactory;
 
         public IndexingController(
             IConfigurationService configurationService, 
@@ -35,7 +35,7 @@ namespace SiteIndexer.Controllers
             IStringService stringService,
             IIndexingService indexingService,
             IJobService jobService,
-            ISiteCrawlerFactory siteCrawlerFactory)
+            ISiteParserFactory siteCrawlerFactory)
         {
             ConfigurationService = configurationService;
             SolrApiService = solrApiService;

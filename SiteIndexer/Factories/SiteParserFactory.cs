@@ -8,12 +8,12 @@ using SiteIndexer.Services.Solr.Models;
 
 namespace SiteIndexer.Factories
 {
-    public interface ISiteCrawlerFactory
+    public interface ISiteParserFactory
     {
         ISiteParser Create(string type);
     }
 
-    public class SiteCrawlerFactory : ISiteCrawlerFactory
+    public class SiteParserFactory : ISiteParserFactory
     {
         public ISiteParser Create(string type = "Default")
         {

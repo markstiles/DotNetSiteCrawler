@@ -19,9 +19,6 @@ namespace SiteIndexer
         {
             services.AddHttpClient();
 
-            //settings
-            services.AddTransient<ISettings, Settings>();
-
             //controllers
             services.AddTransient<HomeController>();
             services.AddTransient<ConfigurationController>();
@@ -41,7 +38,7 @@ namespace SiteIndexer
             services.AddSingleton<IJobService, JobService>();
 
             //factories
-            services.AddTransient<ISiteCrawlerFactory, SiteCrawlerFactory>();
+            services.AddTransient<ISiteParserFactory, SiteParserFactory>();
         }
     }
 }
