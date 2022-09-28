@@ -107,7 +107,7 @@ namespace SiteIndexer.Controllers
             {
                 var parser = SiteCrawlerFactory.Create(site.Parser);
                 
-                messages.Add($"Starting to crawl: {site.Url}");
+                messages.Add($"Starting: {site.Url}");
                 var startUri = new Uri($"{site.Url}/");
                 var toIndex = new Dictionary<string, Uri>
                 {
@@ -143,9 +143,9 @@ namespace SiteIndexer.Controllers
 
                     messages.Add($"Found: {(toIndex.Count + isIndexed.Count)} - Crawled: {isIndexed.Count} - Remaining - {toIndex.Count}");
                 }
-            }
 
-            messages.Add($"Finished crawling and indexing {siteList.Count} sites");
+                messages.Add($"Finished: {site.Url}");
+            }
 
             //remove anything from solr that wasn't updated
             SolrApiService.DeleteDocumentsByQuery(solrConfig.Url, solrConfig.Core, $"-updated:{updatedDate}");

@@ -44,21 +44,26 @@ namespace SiteIndexer.Services.Jobs
             lock (lockObject)
             {
                 var updatedLastDate = DateTime.Now;
-                var messages = RunningJobs[jobHandle].MessageList.Messages.Where(a => a.Value > lastDateReceived).Select(b => b.Key).ToList();
-                if (RunningJobs.ContainsKey(jobHandle))
-                    return new JobStatus
-                    {
-                        Messages = messages,
-                        IsFinished = false,
-                        JobHandle = jobHandle,
-                        LastReceived = updatedLastDate
-                    };
+                var isRunning = RunningJobs.ContainsKey(jobHandle);
+                var isFinished = FinishedJobs.ContainsKey(jobHandle);
+                var jobList = isRunning ? RunningJobs : FinishedJobs;
 
-                messages.Add(FinishedJobs.ContainsKey(jobHandle) ? "Job finished" : "Job not found");
+                var messages = jobList[jobHandle]?
+                    .MessageList.Messages
+                    .Where(a => a.Value > lastDateReceived)
+                    .Select(b => b.Key)
+                    .ToList() 
+                    ?? new List<string>();
+
+                if (!isRunning && isFinished)
+                    messages.Add("Job finished");
+                else if (!isRunning && !isFinished) // not found and probably old or removed
+                    messages.Add("Job not found");
+
                 return new JobStatus
                 {
                     Messages = messages,
-                    IsFinished = true,
+                    IsFinished = !isRunning,
                     JobHandle = jobHandle,
                     LastReceived = updatedLastDate
                 };
