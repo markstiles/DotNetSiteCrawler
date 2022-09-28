@@ -32,8 +32,6 @@ jQuery(document).ready(function ()
             }
         ).done(function (jobResult)
         {
-            jQuery(progressIndicator).hide();
-       
             var lastDate = new Date()
             lastDate.setDate(lastDate.getDate() - 1)
 
