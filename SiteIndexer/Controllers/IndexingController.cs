@@ -96,9 +96,11 @@ namespace SiteIndexer.Controllers
         public void ProcessConfiguration(Guid crawlerId, MessageList messages)
         {
             var config = ConfigurationService.GetCrawler(crawlerId);
-            var siteList = config.Sites.Select(a => ConfigurationService.GetSite(a));
+            var siteList = config.Sites.Select(a => ConfigurationService.GetSite(a)).ToList();
             var solrConfig = ConfigurationService.GetSolrConnection(config.SolrConnection);
             var updatedDate = DateTime.Now.ToString("yyy-MM-ddThh:mm:ssZ");
+
+            messages.Add($"Found {siteList.Count} sites to crawl and index");
 
             var isIndexed = new Dictionary<string, Uri>();
             foreach (var site in siteList)
@@ -142,6 +144,8 @@ namespace SiteIndexer.Controllers
                     messages.Add($"Found: {(toIndex.Count + isIndexed.Count)} - Crawled: {isIndexed.Count} - Remaining - {toIndex.Count}");
                 }
             }
+
+            messages.Add($"Finished crawling and indexing {siteList.Count} sites");
 
             //remove anything from solr that wasn't updated
             SolrApiService.DeleteDocumentsByQuery(solrConfig.Url, solrConfig.Core, $"-updated:{updatedDate}");
