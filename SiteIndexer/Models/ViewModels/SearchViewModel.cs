@@ -8,6 +8,7 @@ namespace SiteIndexer.Models.ViewModels
 {
     public class SearchViewModel
     {
-        public List<SolrConnectionModel> SolrConnections { get; set; } 
+        public List<SolrConnectionModel> SolrConnections { get; set; }
+        public List<AzureConnectionModel> AzureConnections { get; set; }        
     }
 }

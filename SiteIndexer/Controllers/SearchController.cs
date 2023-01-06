@@ -5,6 +5,9 @@ using SiteIndexer.Services.Solr;
 using SiteIndexer.Services.Solr.Models;
 using System;
 using System.Web.Mvc;
+using System.Collections.Generic;
+using System.Linq;
+using SiteIndexer.Services.Azure.Models;
 
 namespace SiteIndexer.Controllers
 {
@@ -14,13 +17,16 @@ namespace SiteIndexer.Controllers
 
         protected readonly IConfigurationService ConfigurationService;
         protected readonly ISolrApiService SolrApiService;
+        protected readonly IAzureApiService AzureApiService;
 
         public SearchController(
             IConfigurationService configurationService, 
-            ISolrApiService solrApiService)
+            ISolrApiService solrApiService,
+            IAzureApiService azureApiService)
         {
             ConfigurationService = configurationService;
             SolrApiService = solrApiService;
+            AzureApiService = azureApiService;
         }
 
         #endregion
@@ -31,7 +37,8 @@ namespace SiteIndexer.Controllers
 
             var model = new SearchViewModel
             {
-                SolrConnections = ConfigurationService.GetSolrConnections()
+                SolrConnections = ConfigurationService.GetSolrConnections(),
+                AzureConnections = ConfigurationService.GetAzureConnections()
             };
 
             return View(model);
@@ -40,20 +47,45 @@ namespace SiteIndexer.Controllers
         #region Post Methods
 
         [HttpPost]
-        public ActionResult Search(Guid solrConnectionId, string query)
+        public ActionResult Search(Guid connectionId, string query)
         {
-            var config = ConfigurationService.GetSolrConnection(solrConnectionId);
-            var searchQuery = string.IsNullOrWhiteSpace(query) ? "*:*" : $"title:{query} or content:{query}";
-            var response = SolrApiService.SearchDocuments<DocApiModel>(config.Url, config.Core, searchQuery);
+            var solrConfig = ConfigurationService.GetSolrConnection(connectionId);
+            var azureConfig = ConfigurationService.GetAzureConnection(connectionId);
+            if (solrConfig != null)
+            {
+                var searchQuery = string.IsNullOrWhiteSpace(query) ? "*:*" : $"title:{query} or content:{query}";
+                var response = SolrApiService.SearchDocuments<DocApiModel>(solrConfig.Url, solrConfig.Core, searchQuery);
 
-            var result = new TransactionResult<DocApiModel[]>
+                var result = new TransactionResult<DocApiModel[]>
+                {
+                    Succeeded = true,
+                    ReturnValue = response?.response?.docs ?? new DocApiModel[0],
+                    ErrorMessage = string.Empty
+                };
+
+                return Json(result);
+            }
+            else if(azureConfig != null)
+            {
+                var response = AzureApiService.SearchDocuments<AzureDocumentApiModel>(azureConfig.Url, azureConfig.Core, azureConfig.ApiKey, "");
+
+                var searchResults = response.Value.GetResults().Select(a => a.Document).ToArray();
+
+                var result = new TransactionResult<AzureDocumentApiModel[]>
+                {                    
+                    Succeeded = true,
+                    ReturnValue = searchResults,
+                    ErrorMessage = string.Empty
+                };
+
+                return Json(result);
+            }
+
+            return Json(new TransactionResult<DocApiModel[]>
             {
                 Succeeded = true,
-                ReturnValue = response?.response?.docs ?? new DocApiModel[0],
-                ErrorMessage = string.Empty
-            };
-
-            return Json(result);
+                ErrorMessage = "There was no valid config found"
+            });
         }
 
         #endregion

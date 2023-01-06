@@ -1,6 +1,10 @@
-﻿using SiteIndexer.Factories;
+﻿using Azure;
+using Azure.Search.Documents;
+using Azure.Search.Documents.Models;
+using SiteIndexer.Factories;
 using SiteIndexer.Models;
 using SiteIndexer.Models.FormModels.Attributes;
+using SiteIndexer.Services.Azure.Models;
 using SiteIndexer.Services.Configuration;
 using SiteIndexer.Services.Crawling;
 using SiteIndexer.Services.Indexing;
@@ -22,26 +26,26 @@ namespace SiteIndexer.Controllers
 
         protected readonly IConfigurationService ConfigurationService;
         protected readonly ISolrApiService SolrApiService;
+        protected readonly IAzureApiService AzureApiService;
         protected readonly ICrawlingService CrawlingService;
         protected readonly IStringService StringService;
-        protected readonly IIndexingService IndexingService;
         protected readonly IJobService JobService;
         protected readonly ISiteParserFactory SiteCrawlerFactory;
 
         public IndexingController(
             IConfigurationService configurationService, 
             ISolrApiService solrApiService,
+            IAzureApiService azureApiService,
             ICrawlingService crawlingService,
             IStringService stringService,
-            IIndexingService indexingService,
             IJobService jobService,
             ISiteParserFactory siteCrawlerFactory)
         {
             ConfigurationService = configurationService;
             SolrApiService = solrApiService;
+            AzureApiService = azureApiService;
             CrawlingService = crawlingService;
             StringService = stringService;
-            IndexingService = indexingService;
             JobService = jobService;
             SiteCrawlerFactory = siteCrawlerFactory;
         }
@@ -78,27 +82,48 @@ namespace SiteIndexer.Controllers
         public ActionResult EmptyIndex(Guid CrawlerId)
         {
             var crawler = ConfigurationService.GetCrawler(CrawlerId);
-            var solr = ConfigurationService.GetSolrConnection(crawler.SolrConnection);
-            var response = SolrApiService.DeleteAllDocuments(solr.Url, solr.Core);
-
-            var result = new TransactionResult<SolrUpdateResponseApiModel>
+            
+            if(crawler.Type == "solr")
             {
-                Succeeded = true,
-                ReturnValue = response,
-                ErrorMessage = string.Empty
-            };
+                var solr = ConfigurationService.GetSolrConnection(crawler.Connection);
+                var response = SolrApiService.DeleteAllDocuments(solr.Url, solr.Core);
 
-            return Json(result);
+                var result = new TransactionResult<SolrUpdateResponseApiModel>
+                {
+                    Succeeded = true,
+                    ReturnValue = response,
+                    ErrorMessage = string.Empty
+                };
+
+                return Json(result);
+            }
+            else if (crawler.Type == "azure")
+            {
+                var azure = ConfigurationService.GetAzureConnection(crawler.Connection);
+                var response = AzureApiService.DeleteAllDocuments(azure.Url, azure.Core, azure.ApiKey);
+
+                var result = new TransactionResult<Response<IndexDocumentsResult>>
+                {
+                    Succeeded = true,
+                    ReturnValue = response,
+                    ErrorMessage = string.Empty
+                };
+
+                return Json(result);
+            }
+
+            return Json(null);
         }
 
         #endregion
 
         public void ProcessConfiguration(Guid crawlerId, MessageList messages)
         {
-            var config = ConfigurationService.GetCrawler(crawlerId);
-            var siteList = config.Sites.Select(a => ConfigurationService.GetSite(a)).ToList();
-            var solrConfig = ConfigurationService.GetSolrConnection(config.SolrConnection);
-            var updatedDate = DateTime.Now.ToString("yyy-MM-ddThh:mm:ssZ");
+            var crawler = ConfigurationService.GetCrawler(crawlerId);
+            var siteList = crawler.Sites.Select(a => ConfigurationService.GetSite(a)).ToList();
+
+            var now = DateTime.Now;
+            var updatedDate = now.ToString("yyyy-MM-ddTHH:mm:ssZ");
 
             messages.Add($"Found {siteList.Count} sites to crawl and index");
 
@@ -139,7 +164,35 @@ namespace SiteIndexer.Controllers
 
                     //TODO batch update items so there aren't so many calls
                     //index item
-                    IndexingService.IndexItem(parser, solrConfig.Url, solrConfig.Core, html, currentUri, updatedDate);
+                    var title = parser.GetTitle(html);
+                    var content = parser.GetContent(html);
+
+                    if (crawler.Type == "solr")
+                    {
+                        var model = new SolrDocumentApiModel
+                        {
+                            id = StringService.GetValidKey(currentUri),
+                            title = title,
+                            content = content,
+                            url = currentUri.AbsoluteUri,
+                            updated = updatedDate
+                        };
+                        var solrConfig = ConfigurationService.GetSolrConnection(crawler.Connection);
+                        SolrApiService.AddDocuments(solrConfig.Url, solrConfig.Core, new List<SolrDocumentApiModel> { model });
+                    }
+                    else if (crawler.Type == "azure")
+                    {
+                        var model = new AzureDocumentApiModel
+                        {
+                            id = StringService.GetValidKey(currentUri),
+                            Title = title,
+                            Content = content,
+                            Url = currentUri.AbsoluteUri,
+                            Updated = now
+                        };
+                        var azureConfig = ConfigurationService.GetAzureConnection(crawler.Connection);
+                        AzureApiService.AddDocuments(azureConfig.Url, azureConfig.Core, azureConfig.ApiKey, new List<AzureDocumentApiModel> { model });
+                    }
 
                     messages.Add($"Found: {(toIndex.Count + isIndexed.Count)} - Crawled: {isIndexed.Count} - Remaining - {toIndex.Count}");
                 }
@@ -148,7 +201,16 @@ namespace SiteIndexer.Controllers
             }
 
             //remove anything from solr that wasn't updated
-            SolrApiService.DeleteDocumentsByQuery(solrConfig.Url, solrConfig.Core, $"-updated:{updatedDate}");
+            if (crawler.Type == "solr")
+            {
+                var solrConfig = ConfigurationService.GetSolrConnection(crawler.Connection);
+                SolrApiService.DeleteDocumentsByQuery(solrConfig.Url, solrConfig.Core, $"-updated:{updatedDate}");
+            }
+            else if (crawler.Type == "azure")
+            {
+                var azureConfig = ConfigurationService.GetAzureConnection(crawler.Connection);
+                AzureApiService.DeleteDocumentsByQuery(azureConfig.Url, azureConfig.Core, azureConfig.ApiKey, $"Updated lt {updatedDate}");
+            }
         }
     }
 }

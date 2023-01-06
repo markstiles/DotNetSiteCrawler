@@ -14,6 +14,7 @@ using SiteIndexer.Models;
 using SiteIndexer.Services.Solr.Models;
 using SiteIndexer.Models.FormModels.Attributes;
 using SiteIndexer.Services.Configuration.Models;
+using Azure.Search.Documents.Models;
 
 namespace SiteIndexer.Controllers
 {
@@ -23,13 +24,16 @@ namespace SiteIndexer.Controllers
 
         protected readonly IConfigurationService ConfigurationService;
         protected readonly ISolrApiService SolrApiService;
+        protected readonly IAzureApiService AzureApiService;
 
         public ConfigurationController(
             IConfigurationService configurationService,
-            ISolrApiService solrApiService)
+            ISolrApiService solrApiService,
+            IAzureApiService azureApiService)
         {
             ConfigurationService = configurationService;
             SolrApiService = solrApiService;
+            AzureApiService = azureApiService;
         }
 
         #endregion
@@ -41,6 +45,7 @@ namespace SiteIndexer.Controllers
             var model = new ConfigurationViewModel
             {
                 SolrConnections = ConfigurationService.GetSolrConnections(),
+                AzureConnections = ConfigurationService.GetAzureConnections(),
                 Sites = ConfigurationService.GetSites()
             };
 
@@ -85,6 +90,38 @@ namespace SiteIndexer.Controllers
 
         [HttpPost]
         [ValidateForm]
+        public ActionResult TestAzureConfiguration(AzureConfigFormModel form)
+        {
+            var response = AzureApiService.SearchDocuments<DocApiModel>(form.AzureUrl, form.AzureCore, form.AzureApiKey, "*:*");
+
+            var result = new TransactionResult<SearchResults<DocApiModel>>
+            {
+                Succeeded = true,
+                ReturnValue = response.Value,
+                ErrorMessage = string.Empty
+            };
+
+            return Json(result);
+        }
+
+        [HttpPost]
+        [ValidateForm]
+        public ActionResult CreateAzureConfiguration(AzureConfigFormModel form)
+        {
+            var config = ConfigurationService.CreateAzureConnection(Guid.NewGuid(), form.AzureUrl, form.AzureCore, form.AzureApiKey);
+
+            var result = new TransactionResult<AzureConnectionModel>
+            {
+                Succeeded = true,
+                ReturnValue = config,
+                ErrorMessage = string.Empty
+            };
+
+            return Json(result);
+        }
+
+        [HttpPost]
+        [ValidateForm]
         public ActionResult CreateSiteConfiguration(SiteConfigFormModel form)
         {
             var config = ConfigurationService.CreateSite(Guid.NewGuid(), form.SiteUrl, form.Parser);
@@ -103,7 +140,11 @@ namespace SiteIndexer.Controllers
         [ValidateForm]
         public ActionResult CreateCrawlingConfiguration(CrawlConfigFormModel form)
         {
-            var config = ConfigurationService.CreateCrawler(Guid.NewGuid(), form.CrawlerName, form.SolrConnection, form.Sites);
+            var parts = form.Connection.Split(new string[] { "::" }, StringSplitOptions.RemoveEmptyEntries);
+            var type = parts[0]; 
+            var connection = Guid.Parse(parts[1]);
+            
+            var config = ConfigurationService.CreateCrawler(Guid.NewGuid(), form.CrawlerName, connection, form.Sites, type);
 
             var result = new TransactionResult<CrawlerModel>
             {

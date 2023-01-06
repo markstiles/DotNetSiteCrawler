@@ -9,7 +9,7 @@
         <form class="form" method="post" action="/Indexing/Start" status="/Indexing/GetJobStatus" empty="/Indexing/EmptyIndex">
             <fieldset>
                 <div class="form-row">
-                    <label for="crawler">Solr Connection</label>
+                    <label for="crawler">Choose Crawler</label>
                     <select id="crawler" class="crawler">
                         @foreach (var crawler in Model.Crawlers)
                         {

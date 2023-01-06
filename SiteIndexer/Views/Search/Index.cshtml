@@ -9,9 +9,13 @@
         <form class="search-form" method="post" action="/Search/Search">
             <fieldset>
                 <div class="form-row">
-                    <label for="solr-connection">Solr Connection</label>
-                    <select id="solr-connection" class="solr-connection">
+                    <label for="connection">Connections</label>
+                    <select id="connection" class="connection">
                         @foreach (var sc in Model.SolrConnections)
+                        {
+                            <option value="@sc.Id">@sc.Url/@sc.Core</option>
+                        }
+                        @foreach (var sc in Model.AzureConnections)
                         {
                             <option value="@sc.Id">@sc.Url/@sc.Core</option>
                         }

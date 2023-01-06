@@ -12,6 +12,16 @@ jQuery(document).ready(function ()
     var solrSubmitSuccess = solrConfig + " .submit-success";
     var solrSubmitFailure = solrConfig + " .submit-failure";
 
+    //azure
+    var azureConfig = ".azure-config";
+    var azureConfigForm = azureConfig + " .form";
+    var azureTestFormSubmit = azureConfigForm + " .azure-test";
+    var azureTestSuccess = azureConfig + " .test-success";
+    var azureTestFailure = azureConfig + " .test-failure";
+    var azureConfigFormSubmit = azureConfigForm + " .azure-submit";
+    var azureSubmitSuccess = azureConfig + " .submit-success";
+    var azureSubmitFailure = azureConfig + " .submit-failure";
+
     //site
     var siteConfig = ".site-config";
     var siteConfigForm = siteConfig + " .form";
@@ -26,6 +36,7 @@ jQuery(document).ready(function ()
     var crawlerSubmitSuccess = crawlerConfig + " .submit-success";
     var crawlerSubmitFailure = crawlerConfig + " .submit-failure";
 
+    //Solr
     jQuery(solrTestFormSubmit).click(function (e)
     {
         e.preventDefault();
@@ -99,6 +110,78 @@ jQuery(document).ready(function ()
         });
     }
 
+    //Azure
+    jQuery(azureTestFormSubmit).click(function (e) {
+        e.preventDefault();
+
+        ResetConfigForms();
+        TestAzure();
+    });
+
+    function TestAzure() {
+        var azureUrlValue = jQuery(azureConfigForm + " .azure-url").val();
+        var azureCoreValue = jQuery(azureConfigForm + " .azure-core").val();
+        var azureKeyValue = jQuery(azureConfigForm + " .azure-key").val();
+
+        jQuery(progressIndicator).show();
+
+        jQuery.post(
+            jQuery(azureConfigForm).attr("test"),
+            {
+                AzureUrl: azureUrlValue,
+                AzureCore: azureCoreValue,
+                AzureApiKey: azureKeyValue
+            }
+        ).done(function (r) {
+            jQuery(progressIndicator).hide();
+
+            if (r.Succeeded) {
+                jQuery(azureTestSuccess).show();
+            }
+            else {
+                jQuery(azureTestFailure).show();
+            }
+        });
+    }
+
+    jQuery(azureConfigFormSubmit).click(function (e) {
+        e.preventDefault();
+
+        ResetConfigForms();
+        CreateAzureConfig();
+    });
+
+    function CreateAzureConfig()
+    {
+        var azureUrlValue = jQuery(azureConfigForm + " .azure-url").val();
+        var azureCoreValue = jQuery(azureConfigForm + " .azure-core").val();
+        var azureKeyValue = jQuery(azureConfigForm + " .azure-key").val();
+
+        jQuery(progressIndicator).show();
+
+        jQuery.post(
+            jQuery(azureConfigForm).attr("action"),
+            {
+                AzureUrl: azureUrlValue,
+                AzureCore: azureCoreValue,
+                AzureApiKey: azureKeyValue
+            }
+        ).done(function (r) {
+            jQuery(progressIndicator).hide();
+
+            if (r.Succeeded) {
+                jQuery(azureConfigForm + " .azure-url").val("");
+                jQuery(azureConfigForm + " .azure-core").val("");
+                jQuery(azureConfigForm + " .azure-key").val("");
+                jQuery(azureSubmitSuccess).show();
+            }
+            else {
+                jQuery(azureSubmitFailure).show();
+            }
+        });
+    }
+
+    //Site
     jQuery(siteConfigFormSubmit).click(function (e)
     {
         e.preventDefault();
@@ -135,6 +218,7 @@ jQuery(document).ready(function ()
         });
     }
 
+    //Crawler
     jQuery(crawlerConfigFormSubmit).click(function (e)
     {
         e.preventDefault();
@@ -146,7 +230,7 @@ jQuery(document).ready(function ()
     function CreateCrawlerConfig()
     {
         var crawlerNameValue = jQuery(crawlerConfigForm + " .crawler-name").val();
-        var solrConnectionValue = jQuery(crawlerConfigForm + " .solr-connection").val();
+        var connectionValue = jQuery(crawlerConfigForm + " .connection").val();
         var sitesValue = [];
         jQuery(crawlerConfigForm + " .sites input[type=checkbox]").each(function ()
         {
@@ -160,7 +244,7 @@ jQuery(document).ready(function ()
             jQuery(crawlerConfigForm).attr("action"),
             {
                 CrawlerName: crawlerNameValue,
-                SolrConnection: solrConnectionValue,
+                Connection: connectionValue,
                 Sites: sitesValue
             }
         ).done(function (r)
@@ -178,6 +262,7 @@ jQuery(document).ready(function ()
         });
     }
 
+    //Shared Functions
     function ResetConfigForms()
     {
         jQuery(solrTestSuccess).hide();
@@ -185,6 +270,12 @@ jQuery(document).ready(function ()
 
         jQuery(solrSubmitSuccess).hide();
         jQuery(solrSubmitFailure).hide();
+
+        jQuery(azureTestSuccess).hide();
+        jQuery(azureTestFailure).hide();
+
+        jQuery(azureSubmitSuccess).hide();
+        jQuery(azureSubmitFailure).hide();
 
         jQuery(siteSubmitSuccess).hide();
         jQuery(siteSubmitFailure).hide();

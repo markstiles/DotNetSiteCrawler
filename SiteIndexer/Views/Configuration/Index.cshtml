@@ -35,6 +35,41 @@
             The Solr connection failed to save.
         </div>
     </div>
+    <h2>Create an Azure Connection</h2>
+    <div class="site-section azure-config">
+        <form class="form" method="post" action="/Configuration/CreateAzureConfiguration" test="/Configuration/TestAzureConfiguration">
+            <fieldset>
+                <div class="form-row">
+                    <label for="azure-url">Azure Url</label>
+                    <input type="text" id="azure-url" class="azure-url" />
+                </div>
+                <div class="form-row">
+                    <label for="azure-core">Azure Core</label>
+                    <input type="text" id="azure-core" class="azure-core" />
+                </div>
+                <div class="form-row">
+                    <label for="azure-key">Azure API Key</label>
+                    <input type="text" id="azure-key" class="azure-key" />
+                </div>
+                <div class="form-row button-row">
+                    <button class="azure-test scButton">Test Connection</button>
+                    <button class="azure-submit scButton">Save Connection</button>
+                </div>
+            </fieldset>
+        </form>
+        <div class="test-success">
+            The Azure connection was tested successfully!
+        </div>
+        <div class="test-failure">
+            The Azure connection test failed.
+        </div>
+        <div class="submit-success">
+            The Azure connection was saved successfully!
+        </div>
+        <div class="submit-failure">
+            The Azure connection failed to save.
+        </div>
+    </div>
     <h2>Add Sites</h2>
     <div class="site-section site-config">
         <form class="form" method="post" action="/Configuration/CreateSiteConfiguration">
@@ -70,11 +105,15 @@
                     <input type="text" id="crawler-name" class="crawler-name" />
                 </div>
                 <div class="form-row">
-                    <label for="solr-connection">Solr Connection</label>
-                    <select id="solr-connection" class="solr-connection">
+                    <label for="connection">Connection</label>
+                    <select id="connection" class="connection">
                         @foreach (var sc in Model.SolrConnections)
                         {
-                            <option value="@sc.Id">@sc.Url/@sc.Core</option>
+                            <option value="solr::@sc.Id">@sc.Url/@sc.Core</option>
+                        }
+                        @foreach (var sc in Model.AzureConnections)
+                        {
+                            <option value="azure::@sc.Id">@sc.Url/@sc.Core</option>
                         }
                     </select>
                 </div>

@@ -12,8 +12,8 @@ namespace SiteIndexer.Models.FormModels
     {
         [Required(ErrorMessage = CrawlConfigMessages.CrawlNameRequired)]
         public string CrawlerName { get; set; }
-        [ValidGuid(ErrorMessage = CrawlConfigMessages.SolrConnectionRequired)]
-        public Guid SolrConnection { get; set; }
+        [Required(ErrorMessage = CrawlConfigMessages.SolrConnectionRequired)]
+        public string Connection { get; set; }
         public List<Guid> Sites { get; set; }
     }
 }

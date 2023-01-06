@@ -10,7 +10,7 @@ namespace SiteIndexer.Services.System
     public interface IFileService
     {
         string GetFile(string filePath);
-        List<string> GetFiles(string directoryPath);
+        Dictionary<string, string> GetFiles(string directoryPath);
         void WriteFile(string filePath, string content);
         void EnsureFolderExists(string filePath, bool isDirectory = true);
         string CleanFileName(string filePath);
@@ -27,9 +27,9 @@ namespace SiteIndexer.Services.System
             return text;
         }
 
-        public List<string> GetFiles(string directoryPath)
+        public Dictionary<string, string> GetFiles(string directoryPath)
         {
-            var fileList = new List<string>();
+            var fileList = new Dictionary<string, string>();
             if (string.IsNullOrWhiteSpace(directoryPath))
                 return fileList;
 
@@ -41,7 +41,7 @@ namespace SiteIndexer.Services.System
             foreach (FileInfo fi in rgFiles)
             {
                 string text = File.ReadAllText(fi.FullName);
-                fileList.Add(text);
+                fileList.Add(fi.Name, text);
             }
 
             return fileList;

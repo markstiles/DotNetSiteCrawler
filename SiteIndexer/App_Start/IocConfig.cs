@@ -29,11 +29,11 @@ namespace SiteIndexer
             services.AddTransient<ILogService, LogService>();
             services.AddTransient<ICacheService, CacheService>();
             services.AddTransient<ISolrApiService, SolrApiService>();
+            services.AddTransient<IAzureApiService, AzureApiService>();
             services.AddSingleton<ISolrClient, SolrClient>();
             services.AddTransient<IConfigurationService, ConfigurationService>();
             services.AddTransient<IFileService, FileService>();
             services.AddTransient<ICrawlingService, CrawlingService>();
-            services.AddTransient<IIndexingService, IndexingService>();
             services.AddTransient<IStringService, StringService>();
             services.AddSingleton<IJobService, JobService>();
 

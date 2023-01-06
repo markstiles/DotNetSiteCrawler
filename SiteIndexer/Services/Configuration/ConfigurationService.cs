@@ -15,12 +15,15 @@ namespace SiteIndexer.Services.Configuration
         SolrConnectionModel GetSolrConnection(Guid id);
         List<SolrConnectionModel> GetSolrConnections();
         SolrConnectionModel CreateSolrConnection(Guid id, string url, string core);
+        AzureConnectionModel GetAzureConnection(Guid id);
+        List<AzureConnectionModel> GetAzureConnections();
+        AzureConnectionModel CreateAzureConnection(Guid id, string url, string core, string apiKey);
         SiteModel GetSite(Guid id);
         List<SiteModel> GetSites();
         SiteModel CreateSite(Guid id, string url, string parser);
         CrawlerModel GetCrawler(Guid id);
         List<CrawlerModel> GetCrawlers();
-        CrawlerModel CreateCrawler(Guid id, string crawlerName, Guid solrConnectionId, List<Guid> siteIds);
+        CrawlerModel CreateCrawler(Guid id, string crawlerName, Guid connectionId, List<Guid> siteIds, string type);
     }
 
     public class ConfigurationService : IConfigurationService
@@ -28,6 +31,7 @@ namespace SiteIndexer.Services.Configuration
         #region Constructor
 
         public Dictionary<Guid, SolrConnectionModel> SolrConnections { get; set; }
+        public Dictionary<Guid, AzureConnectionModel> AzureConnections { get; set; }
         public Dictionary<Guid, SiteModel> Sites { get; set; }
         public Dictionary<Guid, CrawlerModel> Crawlers { get; set; }
 
@@ -37,21 +41,31 @@ namespace SiteIndexer.Services.Configuration
         {
             FileService = fileservice;
             SolrConnections = new Dictionary<Guid, SolrConnectionModel>();
+            AzureConnections = new Dictionary<Guid, AzureConnectionModel>();
             Sites = new Dictionary<Guid, SiteModel>();
             Crawlers = new Dictionary<Guid, CrawlerModel>();
 
-            var solrFiles = FileService.GetFiles("App_Data/configurations/solr");
+            var solrFiles = FileService.GetFiles("App_Data/configurations/connections");
             foreach(var f in solrFiles)
             {
-                var model = JsonConvert.DeserializeObject<SolrConnectionModel>(f);
+                if (f.Key.Contains("solr"))
+                {
+                    var model = JsonConvert.DeserializeObject<SolrConnectionModel>(f.Value);
 
-                SolrConnections.Add(model.Id, model);
+                    SolrConnections.Add(model.Id, model);
+                }
+                else if (f.Key.Contains("azure"))
+                {
+                    var model = JsonConvert.DeserializeObject<AzureConnectionModel>(f.Value);
+
+                    AzureConnections.Add(model.Id, model);
+                }                
             }
 
             var siteFiles = FileService.GetFiles("App_Data/configurations/sites");
             foreach (var f in siteFiles)
             {
-                var model = JsonConvert.DeserializeObject<SiteModel>(f);
+                var model = JsonConvert.DeserializeObject<SiteModel>(f.Value);
 
                 Sites.Add(model.Id, model);
             }
@@ -59,7 +73,7 @@ namespace SiteIndexer.Services.Configuration
             var crawlerFiles = FileService.GetFiles("App_Data/configurations/crawlers");
             foreach (var f in crawlerFiles)
             {
-                var model = JsonConvert.DeserializeObject<CrawlerModel>(f);
+                var model = JsonConvert.DeserializeObject<CrawlerModel>(f.Value);
 
                 Crawlers.Add(model.Id, model);
             }
@@ -69,7 +83,7 @@ namespace SiteIndexer.Services.Configuration
 
         public SolrConnectionModel GetSolrConnection(Guid id)
         {
-            return SolrConnections[id];
+            return SolrConnections.ContainsKey(id) ? SolrConnections[id] : null;
         }
 
         public List<SolrConnectionModel> GetSolrConnections()
@@ -87,7 +101,33 @@ namespace SiteIndexer.Services.Configuration
             };
 
             var content = JsonConvert.SerializeObject(config);
-            FileService.WriteFile($"App_Data/configurations/solr/{id}.json", content);
+            FileService.WriteFile($"App_Data/configurations/connections/solr-{id}.json", content);
+
+            return config;
+        }
+
+        public AzureConnectionModel GetAzureConnection(Guid id)
+        {
+            return AzureConnections.ContainsKey(id) ? AzureConnections[id] : null;
+        }
+
+        public List<AzureConnectionModel> GetAzureConnections()
+        {
+            return AzureConnections.Values.ToList();
+        }
+
+        public AzureConnectionModel CreateAzureConnection(Guid id, string url, string core, string apiKey)
+        {
+            var config = new AzureConnectionModel
+            {
+                Id = id,
+                Url = url,
+                Core = core,
+                ApiKey = apiKey
+            };
+
+            var content = JsonConvert.SerializeObject(config);
+            FileService.WriteFile($"App_Data/configurations/connections/azure-{id}.json", content);
 
             return config;
         }
@@ -127,14 +167,15 @@ namespace SiteIndexer.Services.Configuration
             return Crawlers.Values.ToList();
         }
 
-        public CrawlerModel CreateCrawler(Guid id, string crawlerName, Guid solrConnectionId, List<Guid> siteIds)
+        public CrawlerModel CreateCrawler(Guid id, string crawlerName, Guid connectionId, List<Guid> siteIds, string type)
         {
             var config = new CrawlerModel
             {
                 Id = id,
                 CrawlerName = crawlerName,
-                SolrConnection = solrConnectionId,
-                Sites = siteIds
+                Connection = connectionId,
+                Sites = siteIds,
+                Type = type
             };
 
             var content = JsonConvert.SerializeObject(config);

@@ -15,7 +15,14 @@ namespace SiteIndexer.Services.System
     {
         public string GetValidKey(Uri uri)
         {
-            return uri.AbsoluteUri.Replace($"{uri.Scheme}://", "").Replace("www.", "");
+            return HttpUtility.UrlDecode(uri.AbsoluteUri)
+                .Replace($"{uri.Scheme}://", "")
+                .Replace("www.", "")
+                .Replace(".", "-")
+                .Replace("/", "_")
+                .Replace("?", "_")
+                .Replace("&", "_")
+                .Replace(" ", "_");
         }
     }
 }

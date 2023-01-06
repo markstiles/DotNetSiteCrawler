@@ -9,7 +9,8 @@ namespace SiteIndexer.Services.Configuration.Models
     {
         public Guid Id { get; set; }
         public string CrawlerName { get; set; }
-        public Guid SolrConnection { get; set; }
+        public Guid Connection { get; set; }
         public List<Guid> Sites { get; set; }
+        public string Type { get; set; }
     }
 }

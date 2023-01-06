@@ -9,9 +9,9 @@ namespace SiteIndexer.Models.FormModels
 {
     public class SolrConfigFormModel
     {
-        [Required(ErrorMessage = SolrConfigMessages.SolrUrlRequired)]
+        [Required(ErrorMessage = ConfigMessages.SolrUrlRequired)]
         public string SolrUrl { get; set; }
-        [Required(ErrorMessage = SolrConfigMessages.SolrCoreRequired)]
+        [Required(ErrorMessage = ConfigMessages.SolrCoreRequired)]
         public string SolrCore { get; set; }
     }
 }
